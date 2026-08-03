@@ -4,46 +4,125 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="A free, browser-based Arduino UI Generator Suite. Draw custom LED matrix shapes, 7-segment digits, LCD 16x2 characters, and create high-quality mockup images.">
-    <meta name="google-adsense-account" content="ca-pub-3185237114600646">
-    <title>Arduino UI Generator Suite</title>
     
-    <!-- Google AdSense Verification Script -->
+    <!-- AdSense Verification (Root Level) -->
+    <meta name="google-adsense-account" content="ca-pub-3185237114600646">
+    
+    <!-- Google AdSense Script (In Head for better verification) -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3185237114600646" crossorigin="anonymous"></script>
 
+    <title>Arduino UI Generator Suite</title>
+
     <style>
+        * { box-sizing: border-box; }
+        
         :root {
             --primary: #00979d; /* Arduino Teal */
             --primary-hover: #007a7f;
             --bg-color: #f4f4f5;
             --sidebar-bg: #2c3e50;
             --text-light: #ecf0f1;
+            --header-height: 60px;
+            --sidebar-width: 250px;
         }
 
         body {
             font-family: system-ui, -apple-system, sans-serif;
             margin: 0;
             display: flex;
+            flex-direction: column;
             height: 100vh;
             background-color: var(--bg-color);
+            overflow-x: hidden;
         }
 
+        /* --- Mobile Header & Hamburger --- */
+        .mobile-header {
+            display: flex;
+            align-items: center;
+            background-color: var(--primary);
+            color: white;
+            height: var(--header-height);
+            padding: 0 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 20;
+            flex-shrink: 0;
+        }
+
+        .mobile-header h2 {
+            margin: 0;
+            font-size: 1.2rem;
+            flex-grow: 1;
+            text-align: center;
+        }
+
+        .hamburger-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            height: 30px;
+            width: 35px;
+        }
+
+        .hamburger-btn span {
+            display: block;
+            height: 3px;
+            width: 100%;
+            background-color: white;
+            border-radius: 3px;
+            transition: all 0.3s;
+        }
+
+        /* --- Sidebar (Drawer) --- */
         .sidebar {
-            width: 250px;
+            width: var(--sidebar-width);
             background-color: var(--sidebar-bg);
             color: var(--text-light);
             display: flex;
             flex-direction: column;
             padding-top: 20px;
             box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            flex-shrink: 0;
+            position: fixed;
+            top: var(--header-height);
+            bottom: 0;
+            left: 0;
+            transform: translateX(-100%); /* Hidden by default on mobile */
+            transition: transform 0.3s ease-in-out;
+            z-index: 15;
             overflow-y: auto;
         }
 
-        .sidebar h2 {
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 1.2rem;
-            color: var(--primary);
+        .sidebar.open {
+            transform: translateX(0);
+        }
+
+        /* Backdrop overlay for mobile when drawer is open */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: var(--header-height);
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .sidebar-overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .sidebar h2 { 
+            display: none; /* Hidden on mobile, shown in header */
         }
 
         .nav-btn {
@@ -52,26 +131,61 @@
             color: var(--text-light);
             padding: 15px 20px;
             text-align: left;
-            font-size: 15px;
+            font-size: 14px;
             cursor: pointer;
             transition: background 0.2s;
             border-left: 4px solid transparent;
+            width: 100%;
         }
 
-        .nav-btn:hover { background-color: #34495e; }
+        .nav-btn:hover { background-color: rgba(255,255,255,0.05); }
         .nav-btn.active {
             background-color: #34495e;
             border-left: 4px solid var(--primary);
             font-weight: bold;
         }
 
+        /* --- Desktop Overrides --- */
+        @media (min-width: 769px) {
+            body { 
+                flex-direction: row; 
+            }
+            .mobile-header { 
+                display: none; 
+            }
+            .sidebar {
+                position: static;
+                transform: translateX(0); /* Always visible */
+                height: 100vh; /* Full height on desktop */
+            }
+            .sidebar h2 { 
+                display: block; 
+                text-align: center; 
+                margin-bottom: 30px; 
+                font-size: 1.2rem; 
+                color: var(--primary); 
+            }
+            .sidebar-overlay {
+                display: none !important; /* Never show overlay on desktop */
+            }
+        }
+
         .main-content {
             flex-grow: 1;
-            padding: 40px;
+            padding: 20px 15px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             align-items: center;
+            /* Push content down if below mobile header */
+            height: calc(100vh - var(--header-height)); 
+        }
+        
+        @media (min-width: 769px) { 
+            .main-content { 
+                padding: 40px; 
+                height: 100vh; /* Full height on desktop */
+            } 
         }
 
         .tool-section {
@@ -84,8 +198,10 @@
 
         .tool-section.active { display: flex; }
 
-        h1 { color: var(--primary); margin-bottom: 10px; text-align: center; }
-        .intro-text { color: #4a4a4a; margin-bottom: 30px; text-align: center; line-height: 1.5; }
+        h1 { color: var(--primary); margin-bottom: 10px; text-align: center; font-size: 1.5rem; }
+        @media (min-width: 769px) { h1 { font-size: 2rem; } }
+        
+        .intro-text { color: #4a4a4a; margin-bottom: 30px; text-align: center; line-height: 1.5; font-size: 0.95rem; }
 
         .controls {
             margin-bottom: 20px;
@@ -93,10 +209,11 @@
             gap: 10px;
             flex-wrap: wrap;
             justify-content: center;
+            width: 100%;
         }
 
         button.action-btn {
-            padding: 10px 16px;
+            padding: 12px 20px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
@@ -105,47 +222,56 @@
             border: none;
             border-radius: 6px;
             transition: background 0.2s;
+            flex: 1 1 auto;
+            max-width: 200px;
         }
         button.action-btn:hover { background-color: var(--primary-hover); }
 
         pre {
             background-color: #272822;
             color: #f8f8f2;
-            padding: 20px;
+            padding: 15px;
             border-radius: 8px;
             width: 100%;
             overflow-x: auto;
             line-height: 1.4;
+            font-size: 13px;
         }
 
-        .toggle-group { margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-direction: column;}
+        .toggle-group { margin-bottom: 15px; display: flex; gap: 8px; align-items: center; flex-direction: column;}
         .toggle-label { font-size: 14px; color: #4a4a4a; font-weight: bold;}
-        select, input[type="color"], input[type="number"] { padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 14px;}
+        select, input[type="color"], input[type="number"], input[type="text"], textarea { 
+            padding: 10px; border-radius: 4px; border: 1px solid #ccc; font-size: 16px; 
+            width: 100%; font-family: monospace;
+        }
 
+        /* Fluid Grids */
         #r4-matrix {
             display: grid;
-            grid-template-columns: repeat(12, 35px);
-            gap: 4px;
-            background-color: #1e293b; /* Dark PCB-like color */
-            padding: 10px;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 2px;
+            background-color: #1e293b; 
+            padding: 8px;
             border-radius: 8px;
             margin-bottom: 20px;
+            width: 100%;
+            max-width: 500px; 
             user-select: none;
             -webkit-user-select: none;
         }
         .led-r4 {
-            width: 35px; height: 35px;
+            width: 100%; 
+            aspect-ratio: 1 / 1; 
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
         }
         
-        /* The slanted SMD LED shape */
         .led-r4::after {
             content: '';
-            width: 24px; 
-            height: 12px;
+            width: 65%; 
+            height: 35%;
             background-color: #555; 
             border-radius: 2px;
             transform: rotate(-45deg);
@@ -159,18 +285,21 @@
 
         #lcd-matrix {
             display: grid;
-            grid-template-columns: repeat(5, 40px);
+            grid-template-columns: repeat(5, 1fr);
             gap: 2px;
             background-color: #8db522;
-            padding: 10px;
+            padding: 8px;
             border-radius: 4px;
             margin-bottom: 20px;
+            width: 100%;
+            max-width: 250px; 
             box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
             user-select: none;
             -webkit-user-select: none;
         }
         .pixel-lcd {
-            width: 40px; height: 40px;
+            width: 100%; 
+            aspect-ratio: 1 / 1;
             background-color: #7b9c1b;
             cursor: pointer;
             border-radius: 2px;
@@ -179,8 +308,8 @@
 
         .seg-container {
             position: relative;
-            width: 160px; /* Widened slightly to fit the dot and balance proportions */
-            height: 230px; /* Adjusted height */
+            width: 160px;
+            height: 230px; 
             background-color: #1a1a1a; 
             border-radius: 8px;
             margin-bottom: 20px;
@@ -188,23 +317,13 @@
             -webkit-user-select: none;
         }
         
-        .segment {
-            position: absolute;
-            background-color: #333;
-            cursor: pointer;
-            transition: all 0.1s;
-        }
-
+        .segment { position: absolute; background-color: #333; cursor: pointer; transition: all 0.1s; }
         .segment:hover { background-color: #555; }
-        .segment.on {
-            background-color: #ff3b30;
-            filter: drop-shadow(0 0 6px rgba(255, 59, 48, 0.8));
-        }
+        .segment.on { background-color: #ff3b30; filter: drop-shadow(0 0 6px rgba(255, 59, 48, 0.8)); }
 
         .seg-h { clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 10px 100%, 0 50%); }
         .seg-v { clip-path: polygon(50% 0, 100% 10px, 100% calc(100% - 10px), 50% 100%, 0 calc(100% - 10px), 0 10px); }
 
-        /* Recalculated positions for better spacing */
         .seg-a { top: 15px; left: 35px; width: 70px; height: 20px; }
         .seg-b { top: 32px; left: 104px; width: 20px; height: 74px; }
         .seg-c { top: 110px; left: 104px; width: 20px; height: 74px; }
@@ -227,17 +346,39 @@
             display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;
             background: #fff; padding: 15px; border-radius: 8px; 
             box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #ddd;
+            width: 100%;
+        }
+        
+        @media (max-width: 480px) {
+            .settings-panel .toggle-group { flex: 1 1 100%; flex-direction: row; justify-content: space-between; }
+            .settings-panel select, .settings-panel input { width: auto; flex-grow: 1; margin-left: 10px; }
         }
 
         .text-input-box { width: 100%; max-width: 600px; margin-bottom: 20px; }
-        .text-input-box textarea, .text-input-box input {
-            width: 100%; padding: 10px; font-family: monospace; font-size: 16px; 
-            border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box;
+        
+        .ad-container {
+            margin-top: 40px; padding: 10px; width: 100%; max-width: 728px; 
+            background-color: transparent; text-align: center; min-height: 90px; overflow: hidden;
         }
     </style>
 </head>
 <body>
-    <div class="sidebar">
+
+    <!-- Mobile Header -->
+    <div class="mobile-header">
+        <button class="hamburger-btn" onclick="toggleSidebar()">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <h2>Arduino UI Suite</h2>
+    </div>
+
+    <!-- Overlay for mobile drawer -->
+    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Sidebar / Drawer -->
+    <div class="sidebar" id="sidebar">
         <h2>Arduino UI Suite</h2>
         <button class="nav-btn active" onclick="switchTool('tool-r4', this)">UNO R4 Matrix</button>
         <button class="nav-btn" onclick="switchTool('tool-lcd', this)">LCD Custom Char</button>
@@ -276,8 +417,8 @@
         <div id="tool-7seg" class="tool-section">
             <h1>7-Segment Array Generator</h1>
             <p class="intro-text">Click segments to generate byte arrays. Switch hardware types to invert logic automatically.</p>
-            <div class="toggle-group" style="flex-direction:row;">
-                <label class="toggle-label" for="hw-type">Hardware Type:</label>
+            <div class="toggle-group" style="flex-direction:row; margin-bottom: 20px;">
+                <label class="toggle-label" for="hw-type">Logic:</label>
                 <select id="hw-type" onchange="generate7Seg()">
                     <option value="cathode">Common Cathode (HIGH = ON)</option>
                     <option value="anode">Common Anode (LOW = ON)</option>
@@ -306,7 +447,7 @@
             
             <div class="settings-panel">
                 <div class="toggle-group">
-                    <label class="toggle-label" for="sim-size">Display Size:</label>
+                    <label class="toggle-label" for="sim-size">Size:</label>
                     <select id="sim-size" onchange="updateLcdSimSettings()">
                         <option value="8x2">8x2</option>
                         <option value="16x1">16x1</option>
@@ -316,12 +457,12 @@
                     </select>
                 </div>
                 <div class="toggle-group">
-                    <label class="toggle-label" for="sim-bg-color">Background:</label>
-                    <input type="color" id="sim-bg-color" value="#8db522" onchange="updateLcdSimSettings()" style="height: 34px; width: 60px;">
+                    <label class="toggle-label" for="sim-bg-color">Bg:</label>
+                    <input type="color" id="sim-bg-color" value="#8db522" onchange="updateLcdSimSettings()" style="height: 40px; width: 60px; padding: 2px;">
                 </div>
                 <div class="toggle-group">
-                    <label class="toggle-label" for="sim-text-color">Pixel Color:</label>
-                    <input type="color" id="sim-text-color" value="#000000" onchange="updateLcdSimSettings()" style="height: 34px; width: 60px;">
+                    <label class="toggle-label" for="sim-text-color">Pixel:</label>
+                    <input type="color" id="sim-text-color" value="#000000" onchange="updateLcdSimSettings()" style="height: 40px; width: 60px; padding: 2px;">
                 </div>
             </div>
 
@@ -333,7 +474,7 @@
             <canvas id="lcd-sim-canvas" style="cursor: crosshair;"></canvas>
             
             <div class="controls">
-                <button class="action-btn" onclick="clearLcdSim()">Clear Screen</button>
+                <button class="action-btn" onclick="clearLcdSim()">Clear</button>
                 <button class="action-btn" onclick="downloadCanvas('lcd-sim-canvas', 'lcd-mockup.png')">Download PNG</button>
             </div>
         </div>
@@ -344,16 +485,16 @@
             
             <div class="settings-panel">
                 <div class="toggle-group">
-                    <label class="toggle-label" for="sim7-digits">Number of Digits:</label>
-                    <input type="number" id="sim7-digits" value="4" min="1" max="12" onchange="render7SegSim()" style="width: 60px;">
+                    <label class="toggle-label" for="sim7-digits">Digits:</label>
+                    <input type="number" id="sim7-digits" value="4" min="1" max="12" onchange="render7SegSim()" style="width: 80px;">
                 </div>
                 <div class="toggle-group">
-                    <label class="toggle-label" for="sim7-bg">Background:</label>
-                    <input type="color" id="sim7-bg" value="#111111" onchange="render7SegSim()" style="height: 34px; width: 60px;">
+                    <label class="toggle-label" for="sim7-bg">Bg:</label>
+                    <input type="color" id="sim7-bg" value="#111111" onchange="render7SegSim()" style="height: 40px; width: 60px; padding: 2px;">
                 </div>
                 <div class="toggle-group">
-                    <label class="toggle-label" for="sim7-color">Segment Color:</label>
-                    <input type="color" id="sim7-color" value="#ff3b30" onchange="render7SegSim()" style="height: 34px; width: 60px;">
+                    <label class="toggle-label" for="sim7-color">Color:</label>
+                    <input type="color" id="sim7-color" value="#ff3b30" onchange="render7SegSim()" style="height: 40px; width: 60px; padding: 2px;">
                 </div>
             </div>
 
@@ -370,7 +511,7 @@
         </div>
 
         <!-- ADVERTISEMENT CONTAINER -->
-        <div class="ad-container" style="margin-top: 40px; padding: 10px; width: 100%; max-width: 728px; background-color: transparent; text-align: center; min-height: 90px; overflow: hidden;">
+        <div class="ad-container">
             <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3185237114600646" crossorigin="anonymous"></script>
             <ins class="adsbygoogle"
                  style="display:block"
@@ -384,7 +525,7 @@
         </div>
 
         <!-- FOOTER & VISITOR COUNTER -->
-        <div style="margin-top: auto; padding-top: 40px; padding-bottom: 20px; width: 100%; max-width: 800px; display: flex; justify-content: center; align-items: center; gap: 15px; color: #64748b; font-size: 15px; font-weight: 500;">
+        <div style="margin-top: auto; padding-top: 40px; padding-bottom: 20px; width: 100%; display: flex; justify-content: center; align-items: center; gap: 15px; color: #64748b; font-size: 15px; font-weight: 500;">
             <span>&copy; HukuTON 2026</span>
             <a href="https://visitorbadge.io/status?path=hukuton.github.io.arduino.suite" target="_blank">
                 <img src="https://api.visitorbadge.io/api/visitors?path=hukuton.github.io.arduino.suite&countColor=%2300979d" alt="Visitor Count" style="border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); height: 20px;">
@@ -394,17 +535,35 @@
     </div>
 
     <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
+
         function switchTool(toolId, btnElement) {
             document.querySelectorAll('.tool-section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
             document.getElementById(toolId).classList.add('active');
             btnElement.classList.add('active');
+            
+            // Auto-close sidebar on mobile after selection
+            if (window.innerWidth < 769) {
+                document.getElementById('sidebar').classList.remove('open');
+                document.querySelector('.sidebar-overlay').classList.remove('active');
+            }
         }
 
         function copyCode(elementId) {
             const code = document.getElementById(elementId).textContent;
             navigator.clipboard.writeText(code);
-            alert("Code copied!");
+            
+            // Temporary button text feedback
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = "Copied!";
+            setTimeout(() => { btn.innerText = originalText; }, 2000);
         }
 
         function downloadCanvas(canvasId, filename) {
@@ -616,11 +775,24 @@
 
         function handleSimInteract(e) {
             const rect = simCanvas.getBoundingClientRect();
-            const c = Math.floor(((e.clientX || e.touches[0].clientX) - rect.left - SIM_PAD) / SIM_PIX);
-            const r = Math.floor(((e.clientY || e.touches[0].clientY) - rect.top - SIM_PAD) / SIM_PIX);
+            
+            // Calculate scale in case CSS max-width shrinks the canvas visually
+            const scaleX = simCanvas.width / rect.width;
+            const scaleY = simCanvas.height / rect.height;
+            
+            const clientX = e.clientX || (e.touches && e.touches.length > 0 ? e.touches[0].clientX : undefined);
+            const clientY = e.clientY || (e.touches && e.touches.length > 0 ? e.touches[0].clientY : undefined);
+            
+            if (clientX === undefined || clientY === undefined) return;
+
+            // Apply scaling to the click coordinates
+            const c = Math.floor((((clientX - rect.left) * scaleX) - SIM_PAD) / SIM_PIX);
+            const r = Math.floor((((clientY - rect.top) * scaleY) - SIM_PAD) / SIM_PIX);
+            
             if (c >= 0 && c < simData[0].length && r >= 0 && r < simData.length) {
                 if (Array.from({length: simRows-1}, (_, i) => (i+1)*SIM_H + i).includes(r)) return;
                 if (Array.from({length: simCols-1}, (_, i) => (i+1)*SIM_W + i).includes(c)) return;
+                
                 if (e.type === 'mousedown' || e.type === 'touchstart') {
                     simDraw = true; simMode = simData[r][c] ? 0 : 1;
                 }
@@ -628,8 +800,10 @@
             }
         }
         
-        simCanvas.addEventListener('mousedown', handleSimInteract); simCanvas.addEventListener('mousemove', handleSimInteract);
+        simCanvas.addEventListener('mousedown', handleSimInteract); 
+        simCanvas.addEventListener('mousemove', handleSimInteract);
         window.addEventListener('mouseup', () => simDraw = false);
+        
         simCanvas.addEventListener('touchstart', (e)=>{e.preventDefault(); handleSimInteract(e);}, {passive: false});
         simCanvas.addEventListener('touchmove', (e)=>{e.preventDefault(); handleSimInteract(e);}, {passive: false});
         window.addEventListener('touchend', () => simDraw = false);
@@ -697,18 +871,15 @@
             }
 
             // Canvas Sizing
-            // Standard digit is 120px wide (100 for shape, 20 for DP/gap)
-            // Colon is 40px wide
-            let canvasWidth = 40; // padding
+            let canvasWidth = 40; 
             for(let i=0; i<numDigits; i++) {
                 if (parsed[i] && parsed[i].char === ':') canvasWidth += 40;
                 else canvasWidth += 120;
             }
             
             seg7Canvas.width = canvasWidth;
-            seg7Canvas.height = 240; // 180 shape + 60 padding
+            seg7Canvas.height = 240;
             
-            // Draw Background
             seg7Ctx.fillStyle = bgColor;
             seg7Ctx.fillRect(0, 0, seg7Canvas.width, seg7Canvas.height);
 
