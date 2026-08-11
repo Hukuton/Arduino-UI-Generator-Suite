@@ -632,8 +632,8 @@
             codeUint += `  0x${hex2}\n`;
             codeUint += `};\n// matrix.loadFrame(customFrame32);`;
 
-            // Push both formats to the pre tag
-            r4Output.textContent = codeByte + codeUint;
+            // Push both formats to the pre tag using document.getElementById instead of the undefined r4Output variable
+            document.getElementById('code-r4').textContent = codeByte + codeUint;
         }
 
         const LCD_ROWS = 8, LCD_COLS = 5;
