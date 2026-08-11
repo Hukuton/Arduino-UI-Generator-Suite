@@ -602,13 +602,38 @@
         }
         function clearR4() { r4Data = Array.from({ length: R4_ROWS }, () => Array(R4_COLS).fill(0)); initR4(); }
         function generateR4() {
-            let code = `byte customFrame[8][12] = {\n`;
+            // --- FORMAT 1: 2D Byte Array ---
+            let codeByte = `// --- FORMAT 1: 2D Byte Array ---\n`;
+            codeByte += `byte customFrame[8][12] = {\n`;
             for (let r = 0; r < R4_ROWS; r++) {
-                code += `  { ${r4Data[r].join(', ')} }`;
-                code += (r < R4_ROWS - 1) ? `,\n` : `\n`;
+                codeByte += `  { ${r4Data[r].join(', ')} }`;
+                codeByte += (r < R4_ROWS - 1) ? `,\n` : `\n`;
             }
-            code += `};\n// matrix.renderBitmap(customFrame, 8, 12);`;
-            document.getElementById('code-r4').textContent = code;
+            codeByte += `};\n// matrix.renderBitmap(customFrame, 8, 12);\n\n`;
+
+            // --- FORMAT 2: 32-bit Integer Array ---
+            // Construct a flat 96-character binary string from the grid
+            let binString = "";
+            for (let r = 0; r < R4_ROWS; r++) {
+                for (let c = 0; c < R4_COLS; c++) {
+                    binString += r4Data[r][c] ? "1" : "0";
+                }
+            }
+
+            // Slice the binary string into 32-bit chunks, convert to Hex, and pad with leading zeros
+            let hex0 = parseInt(binString.substring(0, 32), 2).toString(16).padStart(8, '0');
+            let hex1 = parseInt(binString.substring(32, 64), 2).toString(16).padStart(8, '0');
+            let hex2 = parseInt(binString.substring(64, 96), 2).toString(16).padStart(8, '0');
+
+            let codeUint = `// --- FORMAT 2: 32-bit Integer Array ---\n`;
+            codeUint += `const uint32_t customFrame32[] = {\n`;
+            codeUint += `  0x${hex0},\n`;
+            codeUint += `  0x${hex1},\n`;
+            codeUint += `  0x${hex2}\n`;
+            codeUint += `};\n// matrix.loadFrame(customFrame32);`;
+
+            // Push both formats to the pre tag
+            r4Output.textContent = codeByte + codeUint;
         }
 
         const LCD_ROWS = 8, LCD_COLS = 5;
