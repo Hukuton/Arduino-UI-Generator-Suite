@@ -1,941 +1,1730 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A free, browser-based Arduino UI Generator Suite. Draw custom LED matrix shapes, 7-segment digits, LCD 16x2 characters, and create high-quality mockup images.">
-    
-    <!-- AdSense Verification (Root Level) -->
-    <meta name="google-adsense-account" content="ca-pub-3185237114600646">
-    
-    <!-- Google AdSense Script (In Head for better verification) -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3185237114600646" crossorigin="anonymous"></script>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta
+            name="description"
+            content="A free, browser-based Arduino UI Generator Suite. Draw custom LED matrix shapes, 7-segment digits, LCD 16x2 characters, and create high-quality mockup images."
+        />
 
-    <title>Arduino UI Generator Suite</title>
+        <!-- AdSense Verification (Root Level) -->
+        <meta name="google-adsense-account" content="ca-pub-3185237114600646" />
 
-    <style>
-        * { box-sizing: border-box; }
-        
-        :root {
-            --primary: #00979d; /* Arduino Teal */
-            --primary-hover: #007a7f;
-            --bg-color: #f4f4f5;
-            --sidebar-bg: #2c3e50;
-            --text-light: #ecf0f1;
-            --header-height: 60px;
-            --sidebar-width: 250px;
-        }
+        <!-- Google AdSense Script (In Head for better verification) -->
+        <script
+            async
+            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3185237114600646"
+            crossorigin="anonymous"
+        ></script>
 
-        body {
-            font-family: system-ui, -apple-system, sans-serif;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            background-color: var(--bg-color);
-            overflow-x: hidden;
-        }
+        <title>Arduino UI Generator Suite</title>
 
-        /* --- Mobile Header & Hamburger --- */
-        .mobile-header {
-            display: flex;
-            align-items: center;
-            background-color: var(--primary);
-            color: white;
-            height: var(--header-height);
-            padding: 0 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            z-index: 20;
-            flex-shrink: 0;
-        }
-
-        .mobile-header h2 {
-            margin: 0;
-            font-size: 1.2rem;
-            flex-grow: 1;
-            text-align: center;
-        }
-
-        .hamburger-btn {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 24px;
-            cursor: pointer;
-            padding: 5px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            height: 30px;
-            width: 35px;
-        }
-
-        .hamburger-btn span {
-            display: block;
-            height: 3px;
-            width: 100%;
-            background-color: white;
-            border-radius: 3px;
-            transition: all 0.3s;
-        }
-
-        /* --- Sidebar (Drawer) --- */
-        .sidebar {
-            width: var(--sidebar-width);
-            background-color: var(--sidebar-bg);
-            color: var(--text-light);
-            display: flex;
-            flex-direction: column;
-            padding-top: 20px;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-            position: fixed;
-            top: var(--header-height);
-            bottom: 0;
-            left: 0;
-            transform: translateX(-100%); /* Hidden by default on mobile */
-            transition: transform 0.3s ease-in-out;
-            z-index: 15;
-            overflow-y: auto;
-        }
-
-        .sidebar.open {
-            transform: translateX(0);
-        }
-
-        /* Backdrop overlay for mobile when drawer is open */
-        .sidebar-overlay {
-            display: none;
-            position: fixed;
-            top: var(--header-height);
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 10;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        
-        .sidebar-overlay.active {
-            display: block;
-            opacity: 1;
-        }
-
-        .sidebar h2 { 
-            display: none; /* Hidden on mobile, shown in header */
-        }
-
-        .nav-btn {
-            background: none;
-            border: none;
-            color: var(--text-light);
-            padding: 15px 20px;
-            text-align: left;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background 0.2s;
-            border-left: 4px solid transparent;
-            width: 100%;
-        }
-
-        .nav-btn:hover { background-color: rgba(255,255,255,0.05); }
-        .nav-btn.active {
-            background-color: #34495e;
-            border-left: 4px solid var(--primary);
-            font-weight: bold;
-        }
-
-        /* --- Desktop Overrides --- */
-        @media (min-width: 769px) {
-            body { 
-                flex-direction: row; 
+        <style>
+            * {
+                box-sizing: border-box;
             }
-            .mobile-header { 
-                display: none; 
+
+            :root {
+                --primary: #00979d; /* Arduino Teal */
+                --primary-hover: #007a7f;
+                --bg-color: #f4f4f5;
+                --sidebar-bg: #2c3e50;
+                --text-light: #ecf0f1;
+                --header-height: 60px;
+                --sidebar-width: 250px;
             }
+
+            body {
+                font-family:
+                    system-ui,
+                    -apple-system,
+                    sans-serif;
+                margin: 0;
+                display: flex;
+                flex-direction: column;
+                height: 100vh;
+                background-color: var(--bg-color);
+                overflow-x: hidden;
+            }
+
+            /* --- Mobile Header & Hamburger --- */
+            .mobile-header {
+                display: flex;
+                align-items: center;
+                background-color: var(--primary);
+                color: white;
+                height: var(--header-height);
+                padding: 0 15px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+                z-index: 20;
+                flex-shrink: 0;
+            }
+
+            .mobile-header h2 {
+                margin: 0;
+                font-size: 1.2rem;
+                flex-grow: 1;
+                text-align: center;
+            }
+
+            .hamburger-btn {
+                background: none;
+                border: none;
+                color: white;
+                font-size: 24px;
+                cursor: pointer;
+                padding: 5px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-around;
+                height: 30px;
+                width: 35px;
+            }
+
+            .hamburger-btn span {
+                display: block;
+                height: 3px;
+                width: 100%;
+                background-color: white;
+                border-radius: 3px;
+                transition: all 0.3s;
+            }
+
+            /* --- Sidebar (Drawer) --- */
             .sidebar {
-                position: static;
-                transform: translateX(0); /* Always visible */
-                height: 100vh; /* Full height on desktop */
+                width: var(--sidebar-width);
+                background-color: var(--sidebar-bg);
+                color: var(--text-light);
+                display: flex;
+                flex-direction: column;
+                padding-top: 20px;
+                box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+                position: fixed;
+                top: var(--header-height);
+                bottom: 0;
+                left: 0;
+                transform: translateX(-100%); /* Hidden by default on mobile */
+                transition: transform 0.3s ease-in-out;
+                z-index: 15;
+                overflow-y: auto;
             }
-            .sidebar h2 { 
-                display: block; 
-                text-align: center; 
-                margin-bottom: 30px; 
-                font-size: 1.2rem; 
-                color: var(--primary); 
+
+            .sidebar.open {
+                transform: translateX(0);
             }
+
+            /* Backdrop overlay for mobile when drawer is open */
             .sidebar-overlay {
-                display: none !important; /* Never show overlay on desktop */
+                display: none;
+                position: fixed;
+                top: var(--header-height);
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 10;
+                opacity: 0;
+                transition: opacity 0.3s;
             }
-        }
 
-        .main-content {
-            flex-grow: 1;
-            padding: 20px 15px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            /* Push content down if below mobile header */
-            height: calc(100vh - var(--header-height)); 
-        }
-        
-        @media (min-width: 769px) { 
-            .main-content { 
-                padding: 40px; 
-                height: 100vh; /* Full height on desktop */
-            } 
-        }
+            .sidebar-overlay.active {
+                display: block;
+                opacity: 1;
+            }
 
-        .tool-section {
-            display: none;
-            width: 100%;
-            max-width: 800px;
-            flex-direction: column;
-            align-items: center;
-        }
+            .sidebar h2 {
+                display: none; /* Hidden on mobile, shown in header */
+            }
 
-        .tool-section.active { display: flex; }
+            .nav-btn {
+                background: none;
+                border: none;
+                color: var(--text-light);
+                padding: 15px 20px;
+                text-align: left;
+                font-size: 14px;
+                cursor: pointer;
+                transition: background 0.2s;
+                border-left: 4px solid transparent;
+                width: 100%;
+            }
 
-        h1 { color: var(--primary); margin-bottom: 10px; text-align: center; font-size: 1.5rem; }
-        @media (min-width: 769px) { h1 { font-size: 2rem; } }
-        
-        .intro-text { color: #4a4a4a; margin-bottom: 30px; text-align: center; line-height: 1.5; font-size: 0.95rem; }
+            .nav-btn:hover {
+                background-color: rgba(255, 255, 255, 0.05);
+            }
+            .nav-btn.active {
+                background-color: #34495e;
+                border-left: 4px solid var(--primary);
+                font-weight: bold;
+            }
 
-        .controls {
-            margin-bottom: 20px;
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: center;
-            width: 100%;
-        }
+            /* --- Desktop Overrides --- */
+            @media (min-width: 769px) {
+                body {
+                    flex-direction: row;
+                }
+                .mobile-header {
+                    display: none;
+                }
+                .sidebar {
+                    position: static;
+                    transform: translateX(0); /* Always visible */
+                    height: 100vh; /* Full height on desktop */
+                }
+                .sidebar h2 {
+                    display: block;
+                    text-align: center;
+                    margin-bottom: 30px;
+                    font-size: 1.2rem;
+                    color: var(--primary);
+                }
+                .sidebar-overlay {
+                    display: none !important; /* Never show overlay on desktop */
+                }
+            }
 
-        button.action-btn {
-            padding: 12px 20px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            transition: background 0.2s;
-            flex: 1 1 auto;
-            max-width: 200px;
-        }
-        button.action-btn:hover { background-color: var(--primary-hover); }
+            .main-content {
+                flex-grow: 1;
+                padding: 20px 15px;
+                overflow-y: auto;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                /* Push content down if below mobile header */
+                height: calc(100vh - var(--header-height));
+            }
 
-        pre {
-            background-color: #272822;
-            color: #f8f8f2;
-            padding: 15px;
-            border-radius: 8px;
-            width: 100%;
-            overflow-x: auto;
-            line-height: 1.4;
-            font-size: 13px;
-        }
+            @media (min-width: 769px) {
+                .main-content {
+                    padding: 40px;
+                    height: 100vh; /* Full height on desktop */
+                }
+            }
 
-        .toggle-group { margin-bottom: 15px; display: flex; gap: 8px; align-items: center; flex-direction: column;}
-        .toggle-label { font-size: 14px; color: #4a4a4a; font-weight: bold;}
-        select, input[type="color"], input[type="number"], input[type="text"], textarea { 
-            padding: 10px; border-radius: 4px; border: 1px solid #ccc; font-size: 16px; 
-            width: 100%; font-family: monospace;
-        }
+            .tool-section {
+                display: none;
+                width: 100%;
+                max-width: 800px;
+                flex-direction: column;
+                align-items: center;
+            }
 
-        /* Fluid Grids */
-        #r4-matrix {
-            display: grid;
-            grid-template-columns: repeat(12, 1fr);
-            gap: 2px;
-            background-color: #1e293b; 
-            padding: 8px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            width: 100%;
-            max-width: 500px; 
-            user-select: none;
-            -webkit-user-select: none;
-        }
-        .led-r4 {
-            width: 100%; 
-            aspect-ratio: 1 / 1; 
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .led-r4::after {
-            content: '';
-            width: 65%; 
-            height: 35%;
-            background-color: #555; 
-            border-radius: 2px;
-            transform: rotate(-45deg);
-            transition: all 0.1s;
-        }
-        
-        .led-r4.on::after { 
-            background-color: #ff3b30; 
-            box-shadow: 0 0 10px #ff3b30, 0 0 4px #ff3b30 inset; 
-        }
+            .tool-section.active {
+                display: flex;
+            }
 
-        #lcd-matrix {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 2px;
-            background-color: #8db522;
-            padding: 8px;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            width: 100%;
-            max-width: 250px; 
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
-            user-select: none;
-            -webkit-user-select: none;
-        }
-        .pixel-lcd {
-            width: 100%; 
-            aspect-ratio: 1 / 1;
-            background-color: #7b9c1b;
-            cursor: pointer;
-            border-radius: 2px;
-        }
-        .pixel-lcd.on { background-color: #000000; box-shadow: 1px 1px 2px rgba(255,255,255,0.2); }
+            h1 {
+                color: var(--primary);
+                margin-bottom: 10px;
+                text-align: center;
+                font-size: 1.5rem;
+            }
+            @media (min-width: 769px) {
+                h1 {
+                    font-size: 2rem;
+                }
+            }
 
-        .seg-container {
-            position: relative;
-            width: 160px;
-            height: 230px; 
-            background-color: #1a1a1a; 
-            border-radius: 8px;
-            margin-bottom: 20px;
-            user-select: none;
-            -webkit-user-select: none;
-        }
-        
-        .segment { position: absolute; background-color: #333; cursor: pointer; transition: all 0.1s; }
-        .segment:hover { background-color: #555; }
-        .segment.on { background-color: #ff3b30; filter: drop-shadow(0 0 6px rgba(255, 59, 48, 0.8)); }
+            .intro-text {
+                color: #4a4a4a;
+                margin-bottom: 30px;
+                text-align: center;
+                line-height: 1.5;
+                font-size: 0.95rem;
+            }
 
-        .seg-h { clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 10px 100%, 0 50%); }
-        .seg-v { clip-path: polygon(50% 0, 100% 10px, 100% calc(100% - 10px), 50% 100%, 0 calc(100% - 10px), 0 10px); }
+            .controls {
+                margin-bottom: 20px;
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+                justify-content: center;
+                width: 100%;
+            }
 
-        .seg-a { top: 15px; left: 35px; width: 70px; height: 20px; }
-        .seg-b { top: 32px; left: 104px; width: 20px; height: 74px; }
-        .seg-c { top: 110px; left: 104px; width: 20px; height: 74px; }
-        .seg-d { top: 181px; left: 35px; width: 70px; height: 20px; }
-        .seg-e { top: 110px; left: 16px; width: 20px; height: 74px; }
-        .seg-f { top: 32px; left: 16px; width: 20px; height: 74px; }
-        .seg-g { top: 98px; left: 35px; width: 70px; height: 20px; }
-        .seg-dp { top: 183px; left: 130px; width: 16px; height: 16px; border-radius: 50%; }
+            button.action-btn {
+                padding: 12px 20px;
+                font-size: 14px;
+                font-weight: 600;
+                cursor: pointer;
+                background-color: var(--primary);
+                color: white;
+                border: none;
+                border-radius: 6px;
+                transition: background 0.2s;
+                flex: 1 1 auto;
+                max-width: 200px;
+            }
+            button.action-btn:hover {
+                background-color: var(--primary-hover);
+            }
 
-        canvas {
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            margin-bottom: 20px;
-            max-width: 100%;
-            height: auto;
-            touch-action: none;
-        }
+            pre {
+                background-color: #272822;
+                color: #f8f8f2;
+                padding: 15px;
+                border-radius: 8px;
+                width: 100%;
+                overflow-x: auto;
+                line-height: 1.4;
+                font-size: 13px;
+            }
 
-        .settings-panel {
-            display: flex; flex-wrap: wrap; justify-content: center; gap: 15px;
-            background: #fff; padding: 15px; border-radius: 8px; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #ddd;
-            width: 100%;
-        }
-        
-        @media (max-width: 480px) {
-            .settings-panel .toggle-group { flex: 1 1 100%; flex-direction: row; justify-content: space-between; }
-            .settings-panel select, .settings-panel input { width: auto; flex-grow: 1; margin-left: 10px; }
-        }
+            .toggle-group {
+                margin-bottom: 15px;
+                display: flex;
+                gap: 8px;
+                align-items: center;
+                flex-direction: column;
+            }
+            .toggle-label {
+                font-size: 14px;
+                color: #4a4a4a;
+                font-weight: bold;
+            }
+            select,
+            input[type="color"],
+            input[type="number"],
+            input[type="text"],
+            textarea {
+                padding: 10px;
+                border-radius: 4px;
+                border: 1px solid #ccc;
+                font-size: 16px;
+                width: 100%;
+                font-family: monospace;
+            }
 
-        .text-input-box { width: 100%; max-width: 600px; margin-bottom: 20px; }
-        
-        .ad-container {
-            margin-top: 40px; padding: 10px; width: 100%; max-width: 728px; 
-            background-color: transparent; text-align: center; min-height: 90px; overflow: hidden;
-        }
-    </style>
-</head>
-<body>
+            /* Fluid Grids */
+            #r4-matrix {
+                display: grid;
+                grid-template-columns: repeat(12, 1fr);
+                gap: 2px;
+                background-color: #1e293b;
+                padding: 8px;
+                border-radius: 8px;
+                margin-bottom: 20px;
+                width: 100%;
+                max-width: 500px;
+                user-select: none;
+                -webkit-user-select: none;
+            }
+            .led-r4 {
+                width: 100%;
+                aspect-ratio: 1 / 1;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
 
-    <!-- Mobile Header -->
-    <div class="mobile-header">
-        <button class="hamburger-btn" onclick="toggleSidebar()">
-            <span></span>
-            <span></span>
-            <span></span>
-        </button>
-        <h2>Arduino UI Suite</h2>
-    </div>
+            .led-r4::after {
+                content: "";
+                width: 65%;
+                height: 35%;
+                background-color: #555;
+                border-radius: 2px;
+                transform: rotate(-45deg);
+                transition: all 0.1s;
+            }
 
-    <!-- Overlay for mobile drawer -->
-    <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+            .led-r4.on::after {
+                background-color: #ff3b30;
+                box-shadow:
+                    0 0 10px #ff3b30,
+                    0 0 4px #ff3b30 inset;
+            }
 
-    <!-- Sidebar / Drawer -->
-    <div class="sidebar" id="sidebar">
-        <h2>Arduino UI Suite</h2>
-        <button class="nav-btn active" onclick="switchTool('tool-r4', this)">UNO R4 Matrix</button>
-        <button class="nav-btn" onclick="switchTool('tool-lcd', this)">LCD Custom Char</button>
-        <button class="nav-btn" onclick="switchTool('tool-7seg', this)">7-Segment Array</button>
-        <button class="nav-btn" onclick="switchTool('tool-lcd-sim', this)">LCD 16x2 Mockup</button>
-        <button class="nav-btn" onclick="switchTool('tool-7seg-sim', this)">7-Segment Mockup</button>
-    </div>
+            #lcd-matrix {
+                display: grid;
+                grid-template-columns: repeat(5, 1fr);
+                gap: 2px;
+                background-color: #8db522;
+                padding: 8px;
+                border-radius: 4px;
+                margin-bottom: 20px;
+                width: 100%;
+                max-width: 250px;
+                box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.2);
+                user-select: none;
+                -webkit-user-select: none;
+            }
+            .pixel-lcd {
+                width: 100%;
+                aspect-ratio: 1 / 1;
+                background-color: #7b9c1b;
+                cursor: pointer;
+                border-radius: 2px;
+            }
+            .pixel-lcd.on {
+                background-color: #000000;
+                box-shadow: 1px 1px 2px rgba(255, 255, 255, 0.2);
+            }
 
-    <div class="main-content">
-        
-        <!-- TOOL 1: UNO R4 MATRIX -->
-        <div id="tool-r4" class="tool-section active">
-            <h1>UNO R4 WiFi Matrix</h1>
-            <p class="intro-text">Draw shapes for the built-in 12x8 LED matrix and generate the code.</p>
-            <div id="r4-matrix"></div>
-            <div class="controls">
-                <button class="action-btn" onclick="clearR4()">Clear</button>
-                <button class="action-btn" onclick="copyCode('code-r4')">Copy Code</button>
-            </div>
-            <pre><code id="code-r4"></code></pre>
+            .seg-container {
+                position: relative;
+                width: 160px;
+                height: 230px;
+                background-color: #1a1a1a;
+                border-radius: 8px;
+                margin-bottom: 20px;
+                user-select: none;
+                -webkit-user-select: none;
+            }
+
+            .segment {
+                position: absolute;
+                background-color: #333;
+                cursor: pointer;
+                transition: all 0.1s;
+            }
+            .segment:hover {
+                background-color: #555;
+            }
+            .segment.on {
+                background-color: #ff3b30;
+                filter: drop-shadow(0 0 6px rgba(255, 59, 48, 0.8));
+            }
+
+            .seg-h {
+                clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 10px 100%, 0 50%);
+            }
+            .seg-v {
+                clip-path: polygon(50% 0, 100% 10px, 100% calc(100% - 10px), 50% 100%, 0 calc(100% - 10px), 0 10px);
+            }
+
+            .seg-a {
+                top: 15px;
+                left: 35px;
+                width: 70px;
+                height: 20px;
+            }
+            .seg-b {
+                top: 32px;
+                left: 104px;
+                width: 20px;
+                height: 74px;
+            }
+            .seg-c {
+                top: 110px;
+                left: 104px;
+                width: 20px;
+                height: 74px;
+            }
+            .seg-d {
+                top: 181px;
+                left: 35px;
+                width: 70px;
+                height: 20px;
+            }
+            .seg-e {
+                top: 110px;
+                left: 16px;
+                width: 20px;
+                height: 74px;
+            }
+            .seg-f {
+                top: 32px;
+                left: 16px;
+                width: 20px;
+                height: 74px;
+            }
+            .seg-g {
+                top: 98px;
+                left: 35px;
+                width: 70px;
+                height: 20px;
+            }
+            .seg-dp {
+                top: 183px;
+                left: 130px;
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+            }
+
+            canvas {
+                border-radius: 8px;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+                margin-bottom: 20px;
+                max-width: 100%;
+                height: auto;
+                touch-action: none;
+            }
+
+            .settings-panel {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 15px;
+                background: #fff;
+                padding: 15px;
+                border-radius: 8px;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+                margin-bottom: 20px;
+                border: 1px solid #ddd;
+                width: 100%;
+            }
+
+            @media (max-width: 480px) {
+                .settings-panel .toggle-group {
+                    flex: 1 1 100%;
+                    flex-direction: row;
+                    justify-content: space-between;
+                }
+                .settings-panel select,
+                .settings-panel input {
+                    width: auto;
+                    flex-grow: 1;
+                    margin-left: 10px;
+                }
+            }
+
+            .text-input-box {
+                width: 100%;
+                max-width: 600px;
+                margin-bottom: 20px;
+            }
+
+            .ad-container {
+                margin-top: 40px;
+                padding: 10px;
+                width: 100%;
+                max-width: 728px;
+                background-color: transparent;
+                text-align: center;
+                min-height: 90px;
+                overflow: hidden;
+            }
+
+            #r4-seq-matrix {
+                display: grid;
+                grid-template-columns: repeat(12, 1fr);
+                gap: 2px;
+                background-color: #1e293b;
+                padding: 8px;
+                border-radius: 8px;
+                margin-bottom: 20px;
+                width: 100%;
+                max-width: 500px;
+                user-select: none;
+                -webkit-user-select: none;
+            }
+
+            #seq-timeline {
+                display: flex;
+                gap: 15px;
+                overflow-x: auto;
+                width: 100%;
+                max-width: 600px;
+                margin-bottom: 20px;
+                padding: 15px;
+                background: #fff;
+                border-radius: 8px;
+                border: 1px solid #ddd;
+                min-height: 100px;
+                align-items: center;
+            }
+
+            .seq-frame-btn {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                background: #ecf0f1;
+                border: 2px solid transparent;
+                border-radius: 6px;
+                cursor: pointer;
+                padding: 8px;
+                transition: 0.2s;
+                min-width: 76px;
+                flex-shrink: 0;
+            }
+
+            .seq-frame-btn:hover {
+                background: #e0e6ed;
+            }
+
+            .seq-frame-btn.active {
+                background: #d1d8e0;
+                border-color: var(--primary);
+            }
+
+            /* Thumbnail Grid Styles */
+            .seq-thumb {
+                width: 60px;
+                height: 40px;
+                background: #1e293b;
+                display: grid;
+                grid-template-columns: repeat(12, 1fr);
+                gap: 1px;
+                padding: 2px;
+                border-radius: 3px;
+                margin-bottom: 8px;
+                pointer-events: none; /* Prevents clicking individual tiny LEDs */
+            }
+
+            .seq-thumb-led {
+                background: #555;
+                border-radius: 1px;
+            }
+
+            .seq-thumb-led.on {
+                background: #ff3b30;
+                box-shadow: 0 0 2px #ff3b30;
+            }
+
+            .seq-info {
+                font-size: 11px;
+                font-weight: bold;
+                color: #2c3e50;
+                display: flex;
+                justify-content: space-between;
+                width: 100%;
+                align-items: center;
+            }
+
+            .seq-info .del-btn {
+                color: #e74c3c;
+                font-size: 12px;
+                padding: 2px;
+            }
+
+            .play-icon-btn {
+                width: 45px !important;
+                height: 45px !important;
+                flex: none !important; /* Prevents it from stretching into an oval */
+                border-radius: 50% !important;
+                padding: 0 !important;
+                font-size: 20px !important;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                line-height: 1;
+                padding-left: 4px !important;
+            }
+
+            .play-icon-btn.playing {
+                padding-left: 0 !important;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- Mobile Header -->
+        <div class="mobile-header">
+            <button class="hamburger-btn" onclick="toggleSidebar()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <h2>Arduino UI Suite</h2>
         </div>
 
-        <!-- TOOL 2: LCD CUSTOM CHARACTER -->
-        <div id="tool-lcd" class="tool-section">
-            <h1>LCD Custom Character</h1>
-            <p class="intro-text">Design a 5x8 pixel custom character for your LiquidCrystal display.</p>
-            <div id="lcd-matrix"></div>
-            <div class="controls">
-                <button class="action-btn" onclick="clearLCD()">Clear</button>
-                <button class="action-btn" onclick="copyCode('code-lcd')">Copy Code</button>
-            </div>
-            <pre><code id="code-lcd"></code></pre>
+        <!-- Overlay for mobile drawer -->
+        <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+        <!-- Sidebar / Drawer -->
+        <div class="sidebar" id="sidebar">
+            <h2>Arduino UI Suite</h2>
+            <button class="nav-btn active" onclick="switchTool('tool-r4', this)">UNO R4 Matrix</button>
+            <button class="nav-btn" onclick="switchTool('tool-r4-seq', this)">UNO R4 Sequence</button>
+            <button class="nav-btn" onclick="switchTool('tool-lcd', this)">LCD Custom Char</button>
+            <button class="nav-btn" onclick="switchTool('tool-7seg', this)">7-Segment Array</button>
+            <button class="nav-btn" onclick="switchTool('tool-lcd-sim', this)">LCD 16x2 Mockup</button>
+            <button class="nav-btn" onclick="switchTool('tool-7seg-sim', this)">7-Segment Mockup</button>
         </div>
 
-        <!-- TOOL 3: 7-SEGMENT ARRAY -->
-        <div id="tool-7seg" class="tool-section">
-            <h1>7-Segment Array Generator</h1>
-            <p class="intro-text">Click segments to generate byte arrays. Switch hardware types to invert logic automatically.</p>
-            <div class="toggle-group" style="flex-direction:row; margin-bottom: 20px;">
-                <label class="toggle-label" for="hw-type">Logic:</label>
-                <select id="hw-type" onchange="generate7Seg()">
-                    <option value="cathode">Common Cathode (HIGH = ON)</option>
-                    <option value="anode">Common Anode (LOW = ON)</option>
-                </select>
+        <div class="main-content">
+            <!-- TOOL 1: UNO R4 MATRIX -->
+            <div id="tool-r4" class="tool-section active">
+                <h1>UNO R4 WiFi Matrix</h1>
+                <p class="intro-text">Draw shapes for the built-in 12x8 LED matrix and generate the code.</p>
+                <div id="r4-matrix"></div>
+                <div class="controls">
+                    <button class="action-btn" onclick="clearR4()">Clear</button>
+                    <button class="action-btn" onclick="copyCode('code-r4')">Copy Code</button>
+                </div>
+                <pre><code id="code-r4"></code></pre>
             </div>
-            <div class="seg-container" id="seg-display">
-                <div class="segment seg-h seg-a" id="segA" onclick="toggleSeg('A')"></div>
-                <div class="segment seg-v seg-b" id="segB" onclick="toggleSeg('B')"></div>
-                <div class="segment seg-v seg-c" id="segC" onclick="toggleSeg('C')"></div>
-                <div class="segment seg-h seg-d" id="segD" onclick="toggleSeg('D')"></div>
-                <div class="segment seg-v seg-e" id="segE" onclick="toggleSeg('E')"></div>
-                <div class="segment seg-v seg-f" id="segF" onclick="toggleSeg('F')"></div>
-                <div class="segment seg-h seg-g" id="segG" onclick="toggleSeg('G')"></div>
-                <div class="segment seg-dp" id="segDP" onclick="toggleSeg('DP')"></div>
-            </div>
-            <div class="controls">
-                <button class="action-btn" onclick="clear7Seg()">Clear</button>
-                <button class="action-btn" onclick="copyCode('code-7seg')">Copy Code</button>
-            </div>
-            <pre><code id="code-7seg"></code></pre>
-        </div>
 
-        <div id="tool-lcd-sim" class="tool-section">
-            <h1>LCD Screen Mockup</h1>
-            <p class="intro-text">Type text or draw directly on the screen, adjust settings, and download as a PNG.</p>
-            
-            <div class="settings-panel">
-                <div class="toggle-group">
-                    <label class="toggle-label" for="sim-size">Size:</label>
-                    <select id="sim-size" onchange="updateLcdSimSettings()">
-                        <option value="8x2">8x2</option>
-                        <option value="16x1">16x1</option>
-                        <option value="16x2" selected>16x2</option>
-                        <option value="16x4">16x4</option>
-                        <option value="20x4">20x4</option>
+            <!-- TOOL 1.5: UNO R4 MATRIX SEQUENCE -->
+            <div id="tool-r4-seq" class="tool-section">
+                <h1>UNO R4 WiFi Sequence</h1>
+                <p class="intro-text">Draw multiple frames, set their duration, and preview your animation.</p>
+
+                <div id="r4-seq-matrix"></div>
+
+                <div class="settings-panel">
+                    <div class="toggle-group" style="flex-direction: row">
+                        <label class="toggle-label" for="seq-duration">Frame Duration (ms):</label>
+                        <input type="number" id="seq-duration" value="100" min="10" step="10" style="width: 120px" />
+                    </div>
+                    <div class="controls" style="margin-bottom: 0; align-items: center">
+                        <button class="action-btn" onclick="addSeqFrame()">Add Frame</button>
+                        <button class="action-btn" onclick="updateSeqFrame()" id="btn-update-seq" disabled>
+                            Update Frame
+                        </button>
+                        <button class="action-btn" onclick="clearR4SeqGrid()">Clear Grid</button>
+                    </div>
+                </div>
+
+                <!-- Playback Controls -->
+                <div
+                    class="controls"
+                    style="
+                        margin-bottom: 10px;
+                        width: 100%;
+                        max-width: 600px;
+                        justify-content: center;
+                        align-items: center;
+                        gap: 20px;
+                    "
+                >
+                    <button
+                        class="action-btn play-icon-btn"
+                        id="btn-play-seq"
+                        onclick="togglePlaySeq()"
+                        style="background-color: #2ecc71"
+                        disabled
+                        title="Play Sequence"
+                    >
+                        &#9654;
+                    </button>
+                    <div class="toggle-group" style="flex-direction: row; margin-bottom: 0">
+                        <input type="checkbox" id="seq-loop" checked />
+                        <label class="toggle-label" for="seq-loop" style="cursor: pointer">Loop Animation</label>
+                    </div>
+                </div>
+
+                <div id="seq-timeline"></div>
+
+                <div class="controls">
+                    <button class="action-btn" onclick="copyCode('code-r4-seq')">Copy Code</button>
+                </div>
+                <pre><code id="code-r4-seq">// Add frames to generate sequence code.</code></pre>
+            </div>
+
+            <!-- TOOL 2: LCD CUSTOM CHARACTER -->
+            <div id="tool-lcd" class="tool-section">
+                <h1>LCD Custom Character</h1>
+                <p class="intro-text">Design a 5x8 pixel custom character for your LiquidCrystal display.</p>
+                <div id="lcd-matrix"></div>
+                <div class="controls">
+                    <button class="action-btn" onclick="clearLCD()">Clear</button>
+                    <button class="action-btn" onclick="copyCode('code-lcd')">Copy Code</button>
+                </div>
+                <pre><code id="code-lcd"></code></pre>
+            </div>
+
+            <!-- TOOL 3: 7-SEGMENT ARRAY -->
+            <div id="tool-7seg" class="tool-section">
+                <h1>7-Segment Array Generator</h1>
+                <p class="intro-text">
+                    Click segments to generate byte arrays. Switch hardware types to invert logic automatically.
+                </p>
+                <div class="toggle-group" style="flex-direction: row; margin-bottom: 20px">
+                    <label class="toggle-label" for="hw-type">Logic:</label>
+                    <select id="hw-type" onchange="generate7Seg()">
+                        <option value="cathode">Common Cathode (HIGH = ON)</option>
+                        <option value="anode">Common Anode (LOW = ON)</option>
                     </select>
                 </div>
-                <div class="toggle-group">
-                    <label class="toggle-label" for="sim-bg-color">Bg:</label>
-                    <input type="color" id="sim-bg-color" value="#8db522" onchange="updateLcdSimSettings()" style="height: 40px; width: 60px; padding: 2px;">
+                <div class="seg-container" id="seg-display">
+                    <div class="segment seg-h seg-a" id="segA" onclick="toggleSeg('A')"></div>
+                    <div class="segment seg-v seg-b" id="segB" onclick="toggleSeg('B')"></div>
+                    <div class="segment seg-v seg-c" id="segC" onclick="toggleSeg('C')"></div>
+                    <div class="segment seg-h seg-d" id="segD" onclick="toggleSeg('D')"></div>
+                    <div class="segment seg-v seg-e" id="segE" onclick="toggleSeg('E')"></div>
+                    <div class="segment seg-v seg-f" id="segF" onclick="toggleSeg('F')"></div>
+                    <div class="segment seg-h seg-g" id="segG" onclick="toggleSeg('G')"></div>
+                    <div class="segment seg-dp" id="segDP" onclick="toggleSeg('DP')"></div>
                 </div>
-                <div class="toggle-group">
-                    <label class="toggle-label" for="sim-text-color">Pixel:</label>
-                    <input type="color" id="sim-text-color" value="#000000" onchange="updateLcdSimSettings()" style="height: 40px; width: 60px; padding: 2px;">
+                <div class="controls">
+                    <button class="action-btn" onclick="clear7Seg()">Clear</button>
+                    <button class="action-btn" onclick="copyCode('code-7seg')">Copy Code</button>
+                </div>
+                <pre><code id="code-7seg"></code></pre>
+            </div>
+
+            <div id="tool-lcd-sim" class="tool-section">
+                <h1>LCD Screen Mockup</h1>
+                <p class="intro-text">
+                    Type text or draw directly on the screen, adjust settings, and download as a PNG.
+                </p>
+
+                <div class="settings-panel">
+                    <div class="toggle-group">
+                        <label class="toggle-label" for="sim-size">Size:</label>
+                        <select id="sim-size" onchange="updateLcdSimSettings()">
+                            <option value="8x2">8x2</option>
+                            <option value="16x1">16x1</option>
+                            <option value="16x2" selected>16x2</option>
+                            <option value="16x4">16x4</option>
+                            <option value="20x4">20x4</option>
+                        </select>
+                    </div>
+                    <div class="toggle-group">
+                        <label class="toggle-label" for="sim-bg-color">Bg:</label>
+                        <input
+                            type="color"
+                            id="sim-bg-color"
+                            value="#8db522"
+                            onchange="updateLcdSimSettings()"
+                            style="height: 40px; width: 60px; padding: 2px"
+                        />
+                    </div>
+                    <div class="toggle-group">
+                        <label class="toggle-label" for="sim-text-color">Pixel:</label>
+                        <input
+                            type="color"
+                            id="sim-text-color"
+                            value="#000000"
+                            onchange="updateLcdSimSettings()"
+                            style="height: 40px; width: 60px; padding: 2px"
+                        />
+                    </div>
+                </div>
+
+                <div class="text-input-box">
+                    <label class="toggle-label" style="display: block; margin-bottom: 5px"
+                        >Type Text (Press Enter for new line):</label
+                    >
+                    <textarea
+                        id="sim-text-input"
+                        rows="3"
+                        oninput="renderTextToSim()"
+                        placeholder="Hello World!"
+                    ></textarea>
+                </div>
+
+                <canvas id="lcd-sim-canvas" style="cursor: crosshair"></canvas>
+
+                <div class="controls">
+                    <button class="action-btn" onclick="clearLcdSim()">Clear</button>
+                    <button class="action-btn" onclick="downloadCanvas('lcd-sim-canvas', 'lcd-mockup.png')">
+                        Download PNG
+                    </button>
                 </div>
             </div>
 
-            <div class="text-input-box">
-                <label class="toggle-label" style="display:block; margin-bottom:5px;">Type Text (Press Enter for new line):</label>
-                <textarea id="sim-text-input" rows="3" oninput="renderTextToSim()" placeholder="Hello World!"></textarea>
+            <div id="tool-7seg-sim" class="tool-section">
+                <h1>7-Segment Mockup</h1>
+                <p class="intro-text">
+                    Type numbers, letters, decimals (.), or colons (:) to generate a realistic multi-digit display.
+                </p>
+
+                <div class="settings-panel">
+                    <div class="toggle-group">
+                        <label class="toggle-label" for="sim7-digits">Digits:</label>
+                        <input
+                            type="number"
+                            id="sim7-digits"
+                            value="4"
+                            min="1"
+                            max="12"
+                            onchange="render7SegSim()"
+                            style="width: 80px"
+                        />
+                    </div>
+                    <div class="toggle-group">
+                        <label class="toggle-label" for="sim7-bg">Bg:</label>
+                        <input
+                            type="color"
+                            id="sim7-bg"
+                            value="#111111"
+                            onchange="render7SegSim()"
+                            style="height: 40px; width: 60px; padding: 2px"
+                        />
+                    </div>
+                    <div class="toggle-group">
+                        <label class="toggle-label" for="sim7-color">Color:</label>
+                        <input
+                            type="color"
+                            id="sim7-color"
+                            value="#ff3b30"
+                            onchange="render7SegSim()"
+                            style="height: 40px; width: 60px; padding: 2px"
+                        />
+                    </div>
+                </div>
+
+                <div class="text-input-box">
+                    <label class="toggle-label" style="display: block; margin-bottom: 5px"
+                        >Text (Letters, Numbers, . or :):</label
+                    >
+                    <input type="text" id="sim7-text" value="12:34" oninput="render7SegSim()" placeholder="12:34" />
+                </div>
+
+                <canvas id="sim7-canvas"></canvas>
+
+                <div class="controls">
+                    <button class="action-btn" onclick="downloadCanvas('sim7-canvas', '7seg-mockup.png')">
+                        Download PNG
+                    </button>
+                </div>
             </div>
-            
-            <canvas id="lcd-sim-canvas" style="cursor: crosshair;"></canvas>
-            
-            <div class="controls">
-                <button class="action-btn" onclick="clearLcdSim()">Clear</button>
-                <button class="action-btn" onclick="downloadCanvas('lcd-sim-canvas', 'lcd-mockup.png')">Download PNG</button>
+
+            <!-- ADVERTISEMENT CONTAINER -->
+            <div class="ad-container">
+                <script
+                    async
+                    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3185237114600646"
+                    crossorigin="anonymous"
+                ></script>
+                <ins
+                    class="adsbygoogle"
+                    style="display: block"
+                    data-ad-client="ca-pub-3185237114600646"
+                    data-ad-slot="REPLACE_WITH_AD_SLOT_ID_IF_NEEDED"
+                    data-ad-format="auto"
+                    data-full-width-responsive="true"
+                ></ins>
+                <script>
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+
+            <!-- FOOTER & VISITOR COUNTER -->
+            <div
+                style="
+                    margin-top: auto;
+                    padding-top: 40px;
+                    padding-bottom: 20px;
+                    width: 100%;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    gap: 15px;
+                    color: #64748b;
+                    font-size: 15px;
+                    font-weight: 500;
+                "
+            >
+                <span>&copy; HukuTON 2026</span>
+                <a href="https://visitorbadge.io/status?path=hukuton.github.io.arduino.suite" target="_blank">
+                    <img
+                        src="https://api.visitorbadge.io/api/visitors?path=hukuton.github.io.arduino.suite&countColor=%2300979d"
+                        alt="Visitor Count"
+                        style="border-radius: 4px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); height: 20px"
+                    />
+                </a>
             </div>
         </div>
 
-        <div id="tool-7seg-sim" class="tool-section">
-            <h1>7-Segment Mockup</h1>
-            <p class="intro-text">Type numbers, letters, decimals (.), or colons (:) to generate a realistic multi-digit display.</p>
-            
-            <div class="settings-panel">
-                <div class="toggle-group">
-                    <label class="toggle-label" for="sim7-digits">Digits:</label>
-                    <input type="number" id="sim7-digits" value="4" min="1" max="12" onchange="render7SegSim()" style="width: 80px;">
-                </div>
-                <div class="toggle-group">
-                    <label class="toggle-label" for="sim7-bg">Bg:</label>
-                    <input type="color" id="sim7-bg" value="#111111" onchange="render7SegSim()" style="height: 40px; width: 60px; padding: 2px;">
-                </div>
-                <div class="toggle-group">
-                    <label class="toggle-label" for="sim7-color">Color:</label>
-                    <input type="color" id="sim7-color" value="#ff3b30" onchange="render7SegSim()" style="height: 40px; width: 60px; padding: 2px;">
-                </div>
-            </div>
-
-            <div class="text-input-box">
-                <label class="toggle-label" style="display:block; margin-bottom:5px;">Text (Letters, Numbers, . or :):</label>
-                <input type="text" id="sim7-text" value="12:34" oninput="render7SegSim()" placeholder="12:34">
-            </div>
-            
-            <canvas id="sim7-canvas"></canvas>
-            
-            <div class="controls">
-                <button class="action-btn" onclick="downloadCanvas('sim7-canvas', '7seg-mockup.png')">Download PNG</button>
-            </div>
-        </div>
-
-        <!-- ADVERTISEMENT CONTAINER -->
-        <div class="ad-container">
-            <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3185237114600646" crossorigin="anonymous"></script>
-            <ins class="adsbygoogle"
-                 style="display:block"
-                 data-ad-client="ca-pub-3185237114600646"
-                 data-ad-slot="REPLACE_WITH_AD_SLOT_ID_IF_NEEDED"
-                 data-ad-format="auto"
-                 data-full-width-responsive="true"></ins>
-            <script>
-                 (adsbygoogle = window.adsbygoogle || []).push({});
-            </script>
-        </div>
-
-        <!-- FOOTER & VISITOR COUNTER -->
-        <div style="margin-top: auto; padding-top: 40px; padding-bottom: 20px; width: 100%; display: flex; justify-content: center; align-items: center; gap: 15px; color: #64748b; font-size: 15px; font-weight: 500;">
-            <span>&copy; HukuTON 2026</span>
-            <a href="https://visitorbadge.io/status?path=hukuton.github.io.arduino.suite" target="_blank">
-                <img src="https://api.visitorbadge.io/api/visitors?path=hukuton.github.io.arduino.suite&countColor=%2300979d" alt="Visitor Count" style="border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); height: 20px;">
-            </a>
-        </div>
-
-    </div>
-
-    <script>
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.querySelector('.sidebar-overlay');
-            sidebar.classList.toggle('open');
-            overlay.classList.toggle('active');
-        }
-
-        function switchTool(toolId, btnElement) {
-            document.querySelectorAll('.tool-section').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
-            document.getElementById(toolId).classList.add('active');
-            btnElement.classList.add('active');
-            
-            // Auto-close sidebar on mobile after selection
-            if (window.innerWidth < 769) {
-                document.getElementById('sidebar').classList.remove('open');
-                document.querySelector('.sidebar-overlay').classList.remove('active');
+        <script>
+            function toggleSidebar() {
+                const sidebar = document.getElementById("sidebar");
+                const overlay = document.querySelector(".sidebar-overlay");
+                sidebar.classList.toggle("open");
+                overlay.classList.toggle("active");
             }
-        }
 
-        function copyCode(elementId) {
-            const code = document.getElementById(elementId).textContent;
-            navigator.clipboard.writeText(code);
-            
-            // Temporary button text feedback
-            const btn = event.target;
-            const originalText = btn.innerText;
-            btn.innerText = "Copied!";
-            setTimeout(() => { btn.innerText = originalText; }, 2000);
-        }
+            function switchTool(toolId, btnElement) {
+                document.querySelectorAll(".tool-section").forEach((el) => el.classList.remove("active"));
+                document.querySelectorAll(".nav-btn").forEach((el) => el.classList.remove("active"));
+                document.getElementById(toolId).classList.add("active");
+                btnElement.classList.add("active");
 
-        function downloadCanvas(canvasId, filename) {
-            const canvas = document.getElementById(canvasId);
-            const link = document.createElement('a');
-            link.download = filename;
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-        }
-
-        function hexToRgba(hex, alpha) {
-            let r = parseInt(hex.substring(1, 3), 16);
-            let g = parseInt(hex.substring(3, 5), 16);
-            let b = parseInt(hex.substring(5, 7), 16);
-            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-        }
-
-        const R4_ROWS = 8, R4_COLS = 12;
-        let r4Data = Array.from({ length: R4_ROWS }, () => Array(R4_COLS).fill(0));
-        function initR4() {
-            const r4Container = document.getElementById('r4-matrix');
-            r4Container.innerHTML = '';
-            for (let r = 0; r < R4_ROWS; r++) {
-                for (let c = 0; c < R4_COLS; c++) {
-                    const led = document.createElement('div');
-                    led.className = 'led-r4';
-                    led.onclick = () => {
-                        r4Data[r][c] = r4Data[r][c] ? 0 : 1;
-                        led.classList.toggle('on');
-                        generateR4();
-                    };
-                    r4Container.appendChild(led);
+                // Auto-close sidebar on mobile after selection
+                if (window.innerWidth < 769) {
+                    document.getElementById("sidebar").classList.remove("open");
+                    document.querySelector(".sidebar-overlay").classList.remove("active");
                 }
             }
-            generateR4();
-        }
-        function clearR4() { r4Data = Array.from({ length: R4_ROWS }, () => Array(R4_COLS).fill(0)); initR4(); }
-        function generateR4() {
-            // --- FORMAT 1: 2D Byte Array ---
-            let codeByte = `// --- FORMAT 1: 2D Byte Array ---\n`;
-            codeByte += `byte customFrame[8][12] = {\n`;
-            for (let r = 0; r < R4_ROWS; r++) {
-                codeByte += `  { ${r4Data[r].join(', ')} }`;
-                codeByte += (r < R4_ROWS - 1) ? `,\n` : `\n`;
-            }
-            codeByte += `};\n// matrix.renderBitmap(customFrame, 8, 12);\n\n`;
 
-            // --- FORMAT 2: 32-bit Integer Array ---
-            // Construct a flat 96-character binary string from the grid
-            let binString = "";
-            for (let r = 0; r < R4_ROWS; r++) {
-                for (let c = 0; c < R4_COLS; c++) {
-                    binString += r4Data[r][c] ? "1" : "0";
+            function copyCode(elementId) {
+                const code = document.getElementById(elementId).textContent;
+                navigator.clipboard.writeText(code);
+
+                // Temporary button text feedback
+                const btn = event.target;
+                const originalText = btn.innerText;
+                btn.innerText = "Copied!";
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                }, 2000);
+            }
+
+            function downloadCanvas(canvasId, filename) {
+                const canvas = document.getElementById(canvasId);
+                const link = document.createElement("a");
+                link.download = filename;
+                link.href = canvas.toDataURL("image/png");
+                link.click();
+            }
+
+            function hexToRgba(hex, alpha) {
+                let r = parseInt(hex.substring(1, 3), 16);
+                let g = parseInt(hex.substring(3, 5), 16);
+                let b = parseInt(hex.substring(5, 7), 16);
+                return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+            }
+
+            const R4_ROWS = 8,
+                R4_COLS = 12;
+            let r4Data = Array.from({ length: R4_ROWS }, () => Array(R4_COLS).fill(0));
+            function initR4() {
+                const r4Container = document.getElementById("r4-matrix");
+                r4Container.innerHTML = "";
+                for (let r = 0; r < R4_ROWS; r++) {
+                    for (let c = 0; c < R4_COLS; c++) {
+                        const led = document.createElement("div");
+                        led.className = "led-r4";
+                        led.onclick = () => {
+                            r4Data[r][c] = r4Data[r][c] ? 0 : 1;
+                            led.classList.toggle("on");
+                            generateR4();
+                        };
+                        r4Container.appendChild(led);
+                    }
                 }
+                generateR4();
             }
-
-            // Slice the binary string into 32-bit chunks, convert to Hex, and pad with leading zeros
-            let hex0 = parseInt(binString.substring(0, 32), 2).toString(16).padStart(8, '0');
-            let hex1 = parseInt(binString.substring(32, 64), 2).toString(16).padStart(8, '0');
-            let hex2 = parseInt(binString.substring(64, 96), 2).toString(16).padStart(8, '0');
-
-            let codeUint = `// --- FORMAT 2: 32-bit Integer Array ---\n`;
-            codeUint += `const uint32_t customFrame32[] = {\n`;
-            codeUint += `  0x${hex0},`;
-            codeUint += ` 0x${hex1},`;
-            codeUint += ` 0x${hex2}\n`;
-            codeUint += `};\n// matrix.loadFrame(customFrame32);`;
-
-            // Push both formats to the pre tag using document.getElementById instead of the undefined r4Output variable
-            document.getElementById('code-r4').textContent = codeByte + codeUint;
-        }
-
-        const LCD_ROWS = 8, LCD_COLS = 5;
-        let lcdData = Array.from({ length: LCD_ROWS }, () => Array(LCD_COLS).fill(0));
-        function initLCD() {
-            const lcdContainer = document.getElementById('lcd-matrix');
-            lcdContainer.innerHTML = '';
-            for (let r = 0; r < LCD_ROWS; r++) {
-                for (let c = 0; c < LCD_COLS; c++) {
-                    const pixel = document.createElement('div');
-                    pixel.className = 'pixel-lcd';
-                    pixel.onclick = () => {
-                        lcdData[r][c] = lcdData[r][c] ? 0 : 1;
-                        pixel.classList.toggle('on');
-                        generateLCD();
-                    };
-                    lcdContainer.appendChild(pixel);
+            function clearR4() {
+                r4Data = Array.from({ length: R4_ROWS }, () => Array(R4_COLS).fill(0));
+                initR4();
+            }
+            function generateR4() {
+                // --- FORMAT 1: 2D Byte Array ---
+                let codeByte = `// --- FORMAT 1: 2D Byte Array ---\n`;
+                codeByte += `byte customFrame[8][12] = {\n`;
+                for (let r = 0; r < R4_ROWS; r++) {
+                    codeByte += `  { ${r4Data[r].join(", ")} }`;
+                    codeByte += r < R4_ROWS - 1 ? `,\n` : `\n`;
                 }
+                codeByte += `};\n// matrix.renderBitmap(customFrame, 8, 12);\n\n`;
+
+                // --- FORMAT 2: 32-bit Integer Array ---
+                // Construct a flat 96-character binary string from the grid
+                let binString = "";
+                for (let r = 0; r < R4_ROWS; r++) {
+                    for (let c = 0; c < R4_COLS; c++) {
+                        binString += r4Data[r][c] ? "1" : "0";
+                    }
+                }
+
+                // Slice the binary string into 32-bit chunks, convert to Hex, and pad with leading zeros
+                let hex0 = parseInt(binString.substring(0, 32), 2).toString(16).padStart(8, "0");
+                let hex1 = parseInt(binString.substring(32, 64), 2).toString(16).padStart(8, "0");
+                let hex2 = parseInt(binString.substring(64, 96), 2).toString(16).padStart(8, "0");
+
+                let codeUint = `// --- FORMAT 2: 32-bit Integer Array ---\n`;
+                codeUint += `const uint32_t customFrame32[] = {\n`;
+                codeUint += `  0x${hex0},`;
+                codeUint += `  0x${hex1},`;
+                codeUint += `  0x${hex2}\n`;
+                codeUint += `};\n// matrix.loadFrame(customFrame32);`;
+
+                // Push both formats to the pre tag using document.getElementById instead of the undefined r4Output variable
+                document.getElementById("code-r4").textContent = codeByte + codeUint;
             }
-            generateLCD();
-        }
-        function clearLCD() { lcdData = Array.from({ length: LCD_ROWS }, () => Array(LCD_COLS).fill(0)); initLCD(); }
-        function generateLCD() {
-            let code = `byte customChar[8] = {\n`;
-            for (let r = 0; r < LCD_ROWS; r++) {
-                code += `  B${lcdData[r].join('')}`;
-                code += (r < LCD_ROWS - 1) ? `,\n` : `\n`;
+
+            const LCD_ROWS = 8,
+                LCD_COLS = 5;
+            let lcdData = Array.from({ length: LCD_ROWS }, () => Array(LCD_COLS).fill(0));
+            function initLCD() {
+                const lcdContainer = document.getElementById("lcd-matrix");
+                lcdContainer.innerHTML = "";
+                for (let r = 0; r < LCD_ROWS; r++) {
+                    for (let c = 0; c < LCD_COLS; c++) {
+                        const pixel = document.createElement("div");
+                        pixel.className = "pixel-lcd";
+                        pixel.onclick = () => {
+                            lcdData[r][c] = lcdData[r][c] ? 0 : 1;
+                            pixel.classList.toggle("on");
+                            generateLCD();
+                        };
+                        lcdContainer.appendChild(pixel);
+                    }
+                }
+                generateLCD();
             }
-            code += `};\n\n// Inside setup(): lcd.createChar(0, customChar);\n// Inside loop(): lcd.write(byte(0));`;
-            document.getElementById('code-lcd').textContent = code;
-        }
+            function clearLCD() {
+                lcdData = Array.from({ length: LCD_ROWS }, () => Array(LCD_COLS).fill(0));
+                initLCD();
+            }
+            function generateLCD() {
+                let code = `byte customChar[8] = {\n`;
+                for (let r = 0; r < LCD_ROWS; r++) {
+                    code += `  B${lcdData[r].join("")}`;
+                    code += r < LCD_ROWS - 1 ? `,\n` : `\n`;
+                }
+                code += `};\n\n// Inside setup(): lcd.createChar(0, customChar);\n// Inside loop(): lcd.write(byte(0));`;
+                document.getElementById("code-lcd").textContent = code;
+            }
 
-        let segState = { A: 0, B: 0, C: 0, D: 0, E: 0, F: 0, G: 0, DP: 0 };
-        function toggleSeg(segmentName) {
-            segState[segmentName] = segState[segmentName] === 0 ? 1 : 0;
-            document.getElementById(`seg${segmentName}`).classList.toggle('on');
-            generate7Seg();
-        }
-        function clear7Seg() {
-            segState = { A: 0, B: 0, C: 0, D: 0, E: 0, F: 0, G: 0, DP: 0 };
-            document.querySelectorAll('.segment').forEach(el => el.classList.remove('on'));
-            generate7Seg();
-        }
-        function generate7Seg() {
-            const isAnode = document.getElementById('hw-type').value === 'anode';
-            let binStr = "";
-            ['DP', 'G', 'F', 'E', 'D', 'C', 'B', 'A'].forEach(key => {
-                let val = segState[key];
-                binStr += (isAnode ? (val === 1 ? 0 : 1) : val);
-            });
-            const hexVal = parseInt(binStr, 2).toString(16).toUpperCase().padStart(2, '0');
-            document.getElementById('code-7seg').textContent = 
-                `byte digit = 0b${binStr}; // Or 0x${hexVal}\n// Format: 0b DP G F E D C B A`;
-        }
+            let segState = { A: 0, B: 0, C: 0, D: 0, E: 0, F: 0, G: 0, DP: 0 };
+            function toggleSeg(segmentName) {
+                segState[segmentName] = segState[segmentName] === 0 ? 1 : 0;
+                document.getElementById(`seg${segmentName}`).classList.toggle("on");
+                generate7Seg();
+            }
+            function clear7Seg() {
+                segState = { A: 0, B: 0, C: 0, D: 0, E: 0, F: 0, G: 0, DP: 0 };
+                document.querySelectorAll(".segment").forEach((el) => el.classList.remove("on"));
+                generate7Seg();
+            }
+            function generate7Seg() {
+                const isAnode = document.getElementById("hw-type").value === "anode";
+                let binStr = "";
+                ["DP", "G", "F", "E", "D", "C", "B", "A"].forEach((key) => {
+                    let val = segState[key];
+                    binStr += isAnode ? (val === 1 ? 0 : 1) : val;
+                });
+                const hexVal = parseInt(binStr, 2).toString(16).toUpperCase().padStart(2, "0");
+                document.getElementById("code-7seg").textContent =
+                    `byte digit = 0b${binStr}; // Or 0x${hexVal}\n// Format: 0b DP G F E D C B A`;
+            }
 
-        const simCanvas = document.getElementById('lcd-sim-canvas');
-        const simCtx = simCanvas.getContext('2d');
-        const simTextInput = document.getElementById('sim-text-input');
-        const SIM_W=5, SIM_H=8, SIM_GAP=1, SIM_PIX=7, SIM_PAD=20;
-        let simCols=16, simRows=2, simBg='#8db522', simText='#000000', simBezel='';
-        let simData=[], simDraw=false, simMode=1;
+            const simCanvas = document.getElementById("lcd-sim-canvas");
+            const simCtx = simCanvas.getContext("2d");
+            const simTextInput = document.getElementById("sim-text-input");
+            const SIM_W = 5,
+                SIM_H = 8,
+                SIM_GAP = 1,
+                SIM_PIX = 7,
+                SIM_PAD = 20;
+            let simCols = 16,
+                simRows = 2,
+                simBg = "#8db522",
+                simText = "#000000",
+                simBezel = "";
+            let simData = [],
+                simDraw = false,
+                simMode = 1;
 
-        const font5x8 = {
-            ' ': [0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00], '!': [0x04,0x04,0x04,0x04,0x00,0x00,0x04,0x00],
-            '"': [0x0A,0x0A,0x0A,0x00,0x00,0x00,0x00,0x00], '#': [0x0A,0x0A,0x1F,0x0A,0x1F,0x0A,0x0A,0x00],
-            '$': [0x04,0x0F,0x14,0x0E,0x05,0x1E,0x04,0x00], '%': [0x18,0x19,0x02,0x04,0x08,0x13,0x03,0x00],
-            '&': [0x0C,0x12,0x14,0x08,0x15,0x12,0x0D,0x00], "'": [0x0C,0x04,0x08,0x00,0x00,0x00,0x00,0x00],
-            '(': [0x02,0x04,0x08,0x08,0x08,0x04,0x02,0x00], ')': [0x08,0x04,0x02,0x02,0x02,0x04,0x08,0x00],
-            '*': [0x00,0x04,0x15,0x0E,0x15,0x04,0x00,0x00], '+': [0x00,0x04,0x04,0x1F,0x04,0x04,0x00,0x00],
-            ',': [0x00,0x00,0x00,0x00,0x0C,0x04,0x08,0x00], '-': [0x00,0x00,0x00,0x1F,0x00,0x00,0x00,0x00],
-            '.': [0x00,0x00,0x00,0x00,0x00,0x0C,0x0C,0x00], '/': [0x00,0x01,0x02,0x04,0x08,0x10,0x00,0x00],
-            '0': [0x0E,0x11,0x13,0x15,0x19,0x11,0x0E,0x00], '1': [0x04,0x0C,0x04,0x04,0x04,0x04,0x0E,0x00],
-            '2': [0x0E,0x11,0x01,0x02,0x04,0x08,0x1F,0x00], '3': [0x1F,0x02,0x04,0x08,0x01,0x11,0x0E,0x00],
-            '4': [0x02,0x06,0x0A,0x12,0x1F,0x02,0x02,0x00], '5': [0x1F,0x10,0x1E,0x01,0x01,0x11,0x0E,0x00],
-            '6': [0x06,0x08,0x10,0x1E,0x11,0x11,0x0E,0x00], '7': [0x1F,0x01,0x02,0x04,0x08,0x08,0x08,0x00],
-            '8': [0x0E,0x11,0x11,0x0E,0x11,0x11,0x0E,0x00], '9': [0x0E,0x11,0x11,0x0F,0x01,0x02,0x0C,0x00],
-            ':': [0x00,0x0C,0x0C,0x00,0x00,0x0C,0x0C,0x00], ';': [0x00,0x0C,0x0C,0x00,0x0C,0x04,0x08,0x00],
-            '<': [0x02,0x04,0x08,0x10,0x08,0x04,0x02,0x00], '=': [0x00,0x00,0x1F,0x00,0x1F,0x00,0x00,0x00],
-            '>': [0x08,0x04,0x02,0x01,0x02,0x04,0x08,0x00], '?': [0x0E,0x11,0x01,0x02,0x04,0x00,0x04,0x00],
-            '@': [0x0E,0x11,0x15,0x15,0x17,0x10,0x0F,0x00], 'A': [0x0E,0x11,0x11,0x1F,0x11,0x11,0x11,0x00],
-            'B': [0x1E,0x11,0x11,0x1E,0x11,0x11,0x1E,0x00], 'C': [0x0E,0x11,0x10,0x10,0x10,0x11,0x0E,0x00],
-            'D': [0x1C,0x12,0x11,0x11,0x11,0x12,0x1C,0x00], 'E': [0x1F,0x10,0x10,0x1E,0x10,0x10,0x1F,0x00],
-            'F': [0x1F,0x10,0x10,0x1E,0x10,0x10,0x10,0x00], 'G': [0x0E,0x11,0x10,0x17,0x11,0x11,0x0F,0x00],
-            'H': [0x11,0x11,0x11,0x1F,0x11,0x11,0x11,0x00], 'I': [0x0E,0x04,0x04,0x04,0x04,0x04,0x0E,0x00],
-            'J': [0x02,0x02,0x02,0x02,0x02,0x12,0x0C,0x00], 'K': [0x11,0x12,0x14,0x18,0x14,0x12,0x11,0x00],
-            'L': [0x10,0x10,0x10,0x10,0x10,0x10,0x1F,0x00], 'M': [0x11,0x1B,0x15,0x11,0x11,0x11,0x11,0x00],
-            'N': [0x11,0x19,0x15,0x13,0x11,0x11,0x11,0x00], 'O': [0x0E,0x11,0x11,0x11,0x11,0x11,0x0E,0x00],
-            'P': [0x1E,0x11,0x11,0x1E,0x10,0x10,0x10,0x00], 'Q': [0x0E,0x11,0x11,0x11,0x15,0x12,0x0D,0x00],
-            'R': [0x1E,0x11,0x11,0x1E,0x14,0x12,0x11,0x00], 'S': [0x0E,0x11,0x10,0x0E,0x01,0x11,0x0E,0x00],
-            'T': [0x1F,0x04,0x04,0x04,0x04,0x04,0x04,0x00], 'U': [0x11,0x11,0x11,0x11,0x11,0x11,0x0E,0x00],
-            'V': [0x11,0x11,0x11,0x0A,0x0A,0x04,0x04,0x00], 'W': [0x11,0x11,0x11,0x15,0x15,0x15,0x0A,0x00],
-            'X': [0x11,0x11,0x0A,0x04,0x0A,0x11,0x11,0x00], 'Y': [0x11,0x11,0x11,0x0A,0x04,0x04,0x04,0x00],
-            'Z': [0x1F,0x01,0x02,0x04,0x08,0x10,0x1F,0x00], 'a': [0x00,0x00,0x0E,0x01,0x0F,0x11,0x0F,0x00],
-            'b': [0x10,0x10,0x16,0x19,0x11,0x11,0x1E,0x00], 'c': [0x00,0x00,0x0E,0x11,0x10,0x11,0x0E,0x00],
-            'd': [0x01,0x01,0x0D,0x13,0x11,0x11,0x0F,0x00], 'e': [0x00,0x00,0x0E,0x11,0x1F,0x10,0x0E,0x00],
-            'f': [0x06,0x09,0x08,0x1C,0x08,0x08,0x08,0x00], 'g': [0x00,0x0F,0x11,0x11,0x0F,0x01,0x0E,0x00],
-            'h': [0x10,0x10,0x16,0x19,0x11,0x11,0x11,0x00], 'i': [0x04,0x00,0x0C,0x04,0x04,0x04,0x0E,0x00],
-            'l': [0x0C,0x04,0x04,0x04,0x04,0x04,0x0E,0x00], 'm': [0x00,0x00,0x1A,0x15,0x15,0x11,0x11,0x00],
-            'n': [0x00,0x00,0x16,0x19,0x11,0x11,0x11,0x00], 'o': [0x00,0x00,0x0E,0x11,0x11,0x11,0x0E,0x00],
-            'p': [0x00,0x00,0x1E,0x11,0x1E,0x10,0x10,0x00], 'q': [0x00,0x00,0x0F,0x11,0x0F,0x01,0x01,0x00],
-            'r': [0x00,0x00,0x16,0x19,0x10,0x10,0x10,0x00], 's': [0x00,0x00,0x0E,0x10,0x0E,0x01,0x1E,0x00],
-            't': [0x08,0x08,0x1C,0x08,0x08,0x09,0x06,0x00], 'u': [0x00,0x00,0x11,0x11,0x11,0x13,0x0D,0x00],
-            'v': [0x00,0x00,0x11,0x11,0x11,0x0A,0x04,0x00], 'w': [0x00,0x00,0x11,0x11,0x15,0x15,0x0A,0x00],
-            'x': [0x00,0x00,0x11,0x0A,0x04,0x0A,0x11,0x00], 'y': [0x00,0x00,0x11,0x11,0x0F,0x01,0x0E,0x00],
-            'z': [0x00,0x00,0x1F,0x02,0x04,0x08,0x1F,0x00]
-        };
+            const font5x8 = {
+                " ": [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00],
+                "!": [0x04, 0x04, 0x04, 0x04, 0x00, 0x00, 0x04, 0x00],
+                '"': [0x0a, 0x0a, 0x0a, 0x00, 0x00, 0x00, 0x00, 0x00],
+                "#": [0x0a, 0x0a, 0x1f, 0x0a, 0x1f, 0x0a, 0x0a, 0x00],
+                $: [0x04, 0x0f, 0x14, 0x0e, 0x05, 0x1e, 0x04, 0x00],
+                "%": [0x18, 0x19, 0x02, 0x04, 0x08, 0x13, 0x03, 0x00],
+                "&": [0x0c, 0x12, 0x14, 0x08, 0x15, 0x12, 0x0d, 0x00],
+                "'": [0x0c, 0x04, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00],
+                "(": [0x02, 0x04, 0x08, 0x08, 0x08, 0x04, 0x02, 0x00],
+                ")": [0x08, 0x04, 0x02, 0x02, 0x02, 0x04, 0x08, 0x00],
+                "*": [0x00, 0x04, 0x15, 0x0e, 0x15, 0x04, 0x00, 0x00],
+                "+": [0x00, 0x04, 0x04, 0x1f, 0x04, 0x04, 0x00, 0x00],
+                ",": [0x00, 0x00, 0x00, 0x00, 0x0c, 0x04, 0x08, 0x00],
+                "-": [0x00, 0x00, 0x00, 0x1f, 0x00, 0x00, 0x00, 0x00],
+                ".": [0x00, 0x00, 0x00, 0x00, 0x00, 0x0c, 0x0c, 0x00],
+                "/": [0x00, 0x01, 0x02, 0x04, 0x08, 0x10, 0x00, 0x00],
+                0: [0x0e, 0x11, 0x13, 0x15, 0x19, 0x11, 0x0e, 0x00],
+                1: [0x04, 0x0c, 0x04, 0x04, 0x04, 0x04, 0x0e, 0x00],
+                2: [0x0e, 0x11, 0x01, 0x02, 0x04, 0x08, 0x1f, 0x00],
+                3: [0x1f, 0x02, 0x04, 0x08, 0x01, 0x11, 0x0e, 0x00],
+                4: [0x02, 0x06, 0x0a, 0x12, 0x1f, 0x02, 0x02, 0x00],
+                5: [0x1f, 0x10, 0x1e, 0x01, 0x01, 0x11, 0x0e, 0x00],
+                6: [0x06, 0x08, 0x10, 0x1e, 0x11, 0x11, 0x0e, 0x00],
+                7: [0x1f, 0x01, 0x02, 0x04, 0x08, 0x08, 0x08, 0x00],
+                8: [0x0e, 0x11, 0x11, 0x0e, 0x11, 0x11, 0x0e, 0x00],
+                9: [0x0e, 0x11, 0x11, 0x0f, 0x01, 0x02, 0x0c, 0x00],
+                ":": [0x00, 0x0c, 0x0c, 0x00, 0x00, 0x0c, 0x0c, 0x00],
+                ";": [0x00, 0x0c, 0x0c, 0x00, 0x0c, 0x04, 0x08, 0x00],
+                "<": [0x02, 0x04, 0x08, 0x10, 0x08, 0x04, 0x02, 0x00],
+                "=": [0x00, 0x00, 0x1f, 0x00, 0x1f, 0x00, 0x00, 0x00],
+                ">": [0x08, 0x04, 0x02, 0x01, 0x02, 0x04, 0x08, 0x00],
+                "?": [0x0e, 0x11, 0x01, 0x02, 0x04, 0x00, 0x04, 0x00],
+                "@": [0x0e, 0x11, 0x15, 0x15, 0x17, 0x10, 0x0f, 0x00],
+                A: [0x0e, 0x11, 0x11, 0x1f, 0x11, 0x11, 0x11, 0x00],
+                B: [0x1e, 0x11, 0x11, 0x1e, 0x11, 0x11, 0x1e, 0x00],
+                C: [0x0e, 0x11, 0x10, 0x10, 0x10, 0x11, 0x0e, 0x00],
+                D: [0x1c, 0x12, 0x11, 0x11, 0x11, 0x12, 0x1c, 0x00],
+                E: [0x1f, 0x10, 0x10, 0x1e, 0x10, 0x10, 0x1f, 0x00],
+                F: [0x1f, 0x10, 0x10, 0x1e, 0x10, 0x10, 0x10, 0x00],
+                G: [0x0e, 0x11, 0x10, 0x17, 0x11, 0x11, 0x0f, 0x00],
+                H: [0x11, 0x11, 0x11, 0x1f, 0x11, 0x11, 0x11, 0x00],
+                I: [0x0e, 0x04, 0x04, 0x04, 0x04, 0x04, 0x0e, 0x00],
+                J: [0x02, 0x02, 0x02, 0x02, 0x02, 0x12, 0x0c, 0x00],
+                K: [0x11, 0x12, 0x14, 0x18, 0x14, 0x12, 0x11, 0x00],
+                L: [0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x1f, 0x00],
+                M: [0x11, 0x1b, 0x15, 0x11, 0x11, 0x11, 0x11, 0x00],
+                N: [0x11, 0x19, 0x15, 0x13, 0x11, 0x11, 0x11, 0x00],
+                O: [0x0e, 0x11, 0x11, 0x11, 0x11, 0x11, 0x0e, 0x00],
+                P: [0x1e, 0x11, 0x11, 0x1e, 0x10, 0x10, 0x10, 0x00],
+                Q: [0x0e, 0x11, 0x11, 0x11, 0x15, 0x12, 0x0d, 0x00],
+                R: [0x1e, 0x11, 0x11, 0x1e, 0x14, 0x12, 0x11, 0x00],
+                S: [0x0e, 0x11, 0x10, 0x0e, 0x01, 0x11, 0x0e, 0x00],
+                T: [0x1f, 0x04, 0x04, 0x04, 0x04, 0x04, 0x04, 0x00],
+                U: [0x11, 0x11, 0x11, 0x11, 0x11, 0x11, 0x0e, 0x00],
+                V: [0x11, 0x11, 0x11, 0x0a, 0x0a, 0x04, 0x04, 0x00],
+                W: [0x11, 0x11, 0x11, 0x15, 0x15, 0x15, 0x0a, 0x00],
+                X: [0x11, 0x11, 0x0a, 0x04, 0x0a, 0x11, 0x11, 0x00],
+                Y: [0x11, 0x11, 0x11, 0x0a, 0x04, 0x04, 0x04, 0x00],
+                Z: [0x1f, 0x01, 0x02, 0x04, 0x08, 0x10, 0x1f, 0x00],
+                a: [0x00, 0x00, 0x0e, 0x01, 0x0f, 0x11, 0x0f, 0x00],
+                b: [0x10, 0x10, 0x16, 0x19, 0x11, 0x11, 0x1e, 0x00],
+                c: [0x00, 0x00, 0x0e, 0x11, 0x10, 0x11, 0x0e, 0x00],
+                d: [0x01, 0x01, 0x0d, 0x13, 0x11, 0x11, 0x0f, 0x00],
+                e: [0x00, 0x00, 0x0e, 0x11, 0x1f, 0x10, 0x0e, 0x00],
+                f: [0x06, 0x09, 0x08, 0x1c, 0x08, 0x08, 0x08, 0x00],
+                g: [0x00, 0x0f, 0x11, 0x11, 0x0f, 0x01, 0x0e, 0x00],
+                h: [0x10, 0x10, 0x16, 0x19, 0x11, 0x11, 0x11, 0x00],
+                i: [0x04, 0x00, 0x0c, 0x04, 0x04, 0x04, 0x0e, 0x00],
+                l: [0x0c, 0x04, 0x04, 0x04, 0x04, 0x04, 0x0e, 0x00],
+                m: [0x00, 0x00, 0x1a, 0x15, 0x15, 0x11, 0x11, 0x00],
+                n: [0x00, 0x00, 0x16, 0x19, 0x11, 0x11, 0x11, 0x00],
+                o: [0x00, 0x00, 0x0e, 0x11, 0x11, 0x11, 0x0e, 0x00],
+                p: [0x00, 0x00, 0x1e, 0x11, 0x1e, 0x10, 0x10, 0x00],
+                q: [0x00, 0x00, 0x0f, 0x11, 0x0f, 0x01, 0x01, 0x00],
+                r: [0x00, 0x00, 0x16, 0x19, 0x10, 0x10, 0x10, 0x00],
+                s: [0x00, 0x00, 0x0e, 0x10, 0x0e, 0x01, 0x1e, 0x00],
+                t: [0x08, 0x08, 0x1c, 0x08, 0x08, 0x09, 0x06, 0x00],
+                u: [0x00, 0x00, 0x11, 0x11, 0x11, 0x13, 0x0d, 0x00],
+                v: [0x00, 0x00, 0x11, 0x11, 0x11, 0x0a, 0x04, 0x00],
+                w: [0x00, 0x00, 0x11, 0x11, 0x15, 0x15, 0x0a, 0x00],
+                x: [0x00, 0x00, 0x11, 0x0a, 0x04, 0x0a, 0x11, 0x00],
+                y: [0x00, 0x00, 0x11, 0x11, 0x0f, 0x01, 0x0e, 0x00],
+                z: [0x00, 0x00, 0x1f, 0x02, 0x04, 0x08, 0x1f, 0x00],
+            };
 
-        function darkenHex(hex, percent) {
-            let r = parseInt(hex.substring(1, 3), 16); let g = parseInt(hex.substring(3, 5), 16); let b = parseInt(hex.substring(5, 7), 16);
-            r = parseInt(r * (100 - percent) / 100); g = parseInt(g * (100 - percent) / 100); b = parseInt(b * (100 - percent) / 100);
-            return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
-        }
+            function darkenHex(hex, percent) {
+                let r = parseInt(hex.substring(1, 3), 16);
+                let g = parseInt(hex.substring(3, 5), 16);
+                let b = parseInt(hex.substring(5, 7), 16);
+                r = parseInt((r * (100 - percent)) / 100);
+                g = parseInt((g * (100 - percent)) / 100);
+                b = parseInt((b * (100 - percent)) / 100);
+                return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+            }
 
-        function updateLcdSimSettings() {
-            const parts = document.getElementById('sim-size').value.split('x');
-            simCols = parseInt(parts[0]); simRows = parseInt(parts[1]);
-            simBg = document.getElementById('sim-bg-color').value;
-            simText = document.getElementById('sim-text-color').value;
-            simBezel = darkenHex(simBg, 30);
-            const totalW = simCols * SIM_W + (simCols - 1) * SIM_GAP;
-            const totalH = simRows * SIM_H + (simRows - 1) * SIM_GAP;
-            simData = Array.from({ length: totalH }, () => Array(totalW).fill(0));
-            simCanvas.width = totalW * SIM_PIX + (SIM_PAD * 2);
-            simCanvas.height = totalH * SIM_PIX + (SIM_PAD * 2);
-            renderTextToSim();
-        }
+            function updateLcdSimSettings() {
+                const parts = document.getElementById("sim-size").value.split("x");
+                simCols = parseInt(parts[0]);
+                simRows = parseInt(parts[1]);
+                simBg = document.getElementById("sim-bg-color").value;
+                simText = document.getElementById("sim-text-color").value;
+                simBezel = darkenHex(simBg, 30);
+                const totalW = simCols * SIM_W + (simCols - 1) * SIM_GAP;
+                const totalH = simRows * SIM_H + (simRows - 1) * SIM_GAP;
+                simData = Array.from({ length: totalH }, () => Array(totalW).fill(0));
+                simCanvas.width = totalW * SIM_PIX + SIM_PAD * 2;
+                simCanvas.height = totalH * SIM_PIX + SIM_PAD * 2;
+                renderTextToSim();
+            }
 
-        function clearLcdSim() { simTextInput.value = ''; updateLcdSimSettings(); }
+            function clearLcdSim() {
+                simTextInput.value = "";
+                updateLcdSimSettings();
+            }
 
-        function renderTextToSim() {
-            const lines = simTextInput.value.split('\n');
-            const totalW = simCols * SIM_W + (simCols - 1) * SIM_GAP;
-            const totalH = simRows * SIM_H + (simRows - 1) * SIM_GAP;
-            simData = Array.from({ length: totalH }, () => Array(totalW).fill(0));
-            
-            for (let r = 0; r < Math.min(lines.length, simRows); r++) {
-                for (let c = 0; c < Math.min(lines[r].length, simCols); c++) {
-                    let charData = font5x8[lines[r][c]] || font5x8['?'];
-                    const startX = c * (SIM_W + SIM_GAP);
-                    const startY = r * (SIM_H + SIM_GAP);
-                    for (let y = 0; y < 8; y++) {
-                        for (let x = 0; x < 5; x++) {
-                            if ((charData[y] >> (4 - x)) & 1) simData[startY + y][startX + x] = 1;
+            function renderTextToSim() {
+                const lines = simTextInput.value.split("\n");
+                const totalW = simCols * SIM_W + (simCols - 1) * SIM_GAP;
+                const totalH = simRows * SIM_H + (simRows - 1) * SIM_GAP;
+                simData = Array.from({ length: totalH }, () => Array(totalW).fill(0));
+
+                for (let r = 0; r < Math.min(lines.length, simRows); r++) {
+                    for (let c = 0; c < Math.min(lines[r].length, simCols); c++) {
+                        let charData = font5x8[lines[r][c]] || font5x8["?"];
+                        const startX = c * (SIM_W + SIM_GAP);
+                        const startY = r * (SIM_H + SIM_GAP);
+                        for (let y = 0; y < 8; y++) {
+                            for (let x = 0; x < 5; x++) {
+                                if ((charData[y] >> (4 - x)) & 1) simData[startY + y][startX + x] = 1;
+                            }
                         }
                     }
                 }
-            }
-            drawLcdSim();
-        }
-
-        function drawLcdSim() {
-            simCtx.fillStyle = simBezel; simCtx.fillRect(0, 0, simCanvas.width, simCanvas.height);
-            simCtx.fillStyle = simBg; simCtx.fillRect(SIM_PAD - 4, SIM_PAD - 4, simCanvas.width - (SIM_PAD*2) + 8, simCanvas.height - (SIM_PAD*2) + 8);
-            
-            for (let r = 0; r < simData.length; r++) {
-                if (Array.from({length: simRows-1}, (_, i) => (i+1)*SIM_H + i).includes(r)) continue;
-                for (let c = 0; c < simData[0].length; c++) {
-                    if (Array.from({length: simCols-1}, (_, i) => (i+1)*SIM_W + i).includes(c)) continue;
-                    simCtx.fillStyle = simData[r][c] ? hexToRgba(simText, 0.85) : hexToRgba(simText, 0.08);
-                    simCtx.fillRect(SIM_PAD + c * SIM_PIX, SIM_PAD + r * SIM_PIX, SIM_PIX - 1, SIM_PIX - 1);
-                }
-            }
-        }
-
-        function handleSimInteract(e) {
-            const rect = simCanvas.getBoundingClientRect();
-            
-            // Calculate scale in case CSS max-width shrinks the canvas visually
-            const scaleX = simCanvas.width / rect.width;
-            const scaleY = simCanvas.height / rect.height;
-            
-            const clientX = e.clientX || (e.touches && e.touches.length > 0 ? e.touches[0].clientX : undefined);
-            const clientY = e.clientY || (e.touches && e.touches.length > 0 ? e.touches[0].clientY : undefined);
-            
-            if (clientX === undefined || clientY === undefined) return;
-
-            // Apply scaling to the click coordinates
-            const c = Math.floor((((clientX - rect.left) * scaleX) - SIM_PAD) / SIM_PIX);
-            const r = Math.floor((((clientY - rect.top) * scaleY) - SIM_PAD) / SIM_PIX);
-            
-            if (c >= 0 && c < simData[0].length && r >= 0 && r < simData.length) {
-                if (Array.from({length: simRows-1}, (_, i) => (i+1)*SIM_H + i).includes(r)) return;
-                if (Array.from({length: simCols-1}, (_, i) => (i+1)*SIM_W + i).includes(c)) return;
-                
-                if (e.type === 'mousedown' || e.type === 'touchstart') {
-                    simDraw = true; simMode = simData[r][c] ? 0 : 1;
-                }
-                if (simDraw) { simData[r][c] = simMode; drawLcdSim(); }
-            }
-        }
-        
-        simCanvas.addEventListener('mousedown', handleSimInteract); 
-        simCanvas.addEventListener('mousemove', handleSimInteract);
-        window.addEventListener('mouseup', () => simDraw = false);
-        
-        simCanvas.addEventListener('touchstart', (e)=>{e.preventDefault(); handleSimInteract(e);}, {passive: false});
-        simCanvas.addEventListener('touchmove', (e)=>{e.preventDefault(); handleSimInteract(e);}, {passive: false});
-        window.addEventListener('touchend', () => simDraw = false);
-
-        const seg7Canvas = document.getElementById('sim7-canvas');
-        const seg7Ctx = seg7Canvas.getContext('2d');
-        
-        const SEG_MAP = {
-            '0': ['A','B','C','D','E','F'], '1': ['B','C'], '2': ['A','B','D','E','G'], '3': ['A','B','C','D','G'],
-            '4': ['B','C','F','G'], '5': ['A','C','D','F','G'], '6': ['A','C','D','E','F','G'], '7': ['A','B','C'],
-            '8': ['A','B','C','D','E','F','G'], '9': ['A','B','C','D','F','G'], 'A': ['A','B','C','E','F','G'],
-            'B': ['C','D','E','F','G'], 'C': ['A','D','E','F'], 'D': ['B','C','D','E','G'], 'E': ['A','D','E','F','G'],
-            'F': ['A','E','F','G'], 'G': ['A','C','D','E','F','G'], 'H': ['B','C','E','F','G'], 'I': ['E','F'],
-            'J': ['B','C','D','E'], 'L': ['D','E','F'], 'N': ['C','E','G'], 'O': ['A','B','C','D','E','F'],
-            'P': ['A','B','E','F','G'], 'Q': ['A','B','C','F','G'], 'R': ['E','G'], 'S': ['A','C','D','F','G'],
-            'T': ['D','E','F','G'], 'U': ['B','C','D','E','F'], 'Y': ['B','C','D','F','G'], '-': ['G'], '_': ['D'], ' ': []
-        };
-
-        const SEG_POLYS = {
-            'A': [[18,0], [82,0], [88,8], [82,16], [18,16], [12,8]],
-            'B': [[100,18], [100,82], [92,90], [84,82], [84,18], [92,10]],
-            'C': [[100,98], [100,162], [92,170], [84,162], [84,98], [92,90]],
-            'D': [[18,180], [82,180], [88,172], [82,164], [18,164], [12,172]],
-            'E': [[0,98], [0,162], [8,170], [16,162], [16,98], [8,90]],
-            'F': [[0,18], [0,82], [8,90], [16,82], [16,18], [8,10]],
-            'G': [[18,90], [24,84], [76,84], [82,90], [76,96], [24,96]]
-        };
-
-        function drawPolygon(ctx, points, dx, dy, isOn, onColor, offColor) {
-            ctx.beginPath();
-            ctx.moveTo(points[0][0] + dx, points[0][1] + dy);
-            for(let i=1; i<points.length; i++) ctx.lineTo(points[i][0] + dx, points[i][1] + dy);
-            ctx.closePath();
-            
-            ctx.fillStyle = isOn ? onColor : offColor;
-            ctx.shadowColor = isOn ? onColor : 'transparent';
-            ctx.shadowBlur = isOn ? 12 : 0;
-            ctx.fill();
-        }
-
-        function drawDot(ctx, x, y, isOn, onColor, offColor) {
-            ctx.beginPath();
-            ctx.arc(x, y, 9, 0, Math.PI * 2);
-            ctx.fillStyle = isOn ? onColor : offColor;
-            ctx.shadowColor = isOn ? onColor : 'transparent';
-            ctx.shadowBlur = isOn ? 12 : 0;
-            ctx.fill();
-        }
-
-        function render7SegSim() {
-            const text = document.getElementById('sim7-text').value.toUpperCase();
-            const numDigits = parseInt(document.getElementById('sim7-digits').value);
-            const bgColor = document.getElementById('sim7-bg').value;
-            const onColor = document.getElementById('sim7-color').value;
-            const offColor = hexToRgba(onColor, 0.08); // Ghosting
-
-            // Parse text
-            let parsed = [];
-            for (let char of text) {
-                if (char === '.' && parsed.length > 0 && parsed[parsed.length-1].char !== ':') {
-                    parsed[parsed.length-1].dp = true;
-                } else {
-                    parsed.push({char: char, dp: false});
-                }
+                drawLcdSim();
             }
 
-            // Canvas Sizing
-            let canvasWidth = 40; 
-            for(let i=0; i<numDigits; i++) {
-                if (parsed[i] && parsed[i].char === ':') canvasWidth += 40;
-                else canvasWidth += 120;
-            }
-            
-            seg7Canvas.width = canvasWidth;
-            seg7Canvas.height = 240;
-            
-            seg7Ctx.fillStyle = bgColor;
-            seg7Ctx.fillRect(0, 0, seg7Canvas.width, seg7Canvas.height);
+            function drawLcdSim() {
+                simCtx.fillStyle = simBezel;
+                simCtx.fillRect(0, 0, simCanvas.width, simCanvas.height);
+                simCtx.fillStyle = simBg;
+                simCtx.fillRect(
+                    SIM_PAD - 4,
+                    SIM_PAD - 4,
+                    simCanvas.width - SIM_PAD * 2 + 8,
+                    simCanvas.height - SIM_PAD * 2 + 8
+                );
 
-            let offsetX = 20;
-            const offsetY = 30;
-
-            for(let i=0; i<numDigits; i++) {
-                let item = parsed[i] || {char: ' ', dp: false};
-                
-                if (item.char === ':') {
-                    drawDot(seg7Ctx, offsetX + 20, offsetY + 50, true, onColor, offColor);
-                    drawDot(seg7Ctx, offsetX + 20, offsetY + 130, true, onColor, offColor);
-                    offsetX += 40;
-                } else {
-                    let activeSegs = SEG_MAP[item.char] || [];
-                    for (const [seg, points] of Object.entries(SEG_POLYS)) {
-                        let isOn = activeSegs.includes(seg);
-                        drawPolygon(seg7Ctx, points, offsetX, offsetY, isOn, onColor, offColor);
+                for (let r = 0; r < simData.length; r++) {
+                    if (Array.from({ length: simRows - 1 }, (_, i) => (i + 1) * SIM_H + i).includes(r)) continue;
+                    for (let c = 0; c < simData[0].length; c++) {
+                        if (Array.from({ length: simCols - 1 }, (_, i) => (i + 1) * SIM_W + i).includes(c)) continue;
+                        simCtx.fillStyle = simData[r][c] ? hexToRgba(simText, 0.85) : hexToRgba(simText, 0.08);
+                        simCtx.fillRect(SIM_PAD + c * SIM_PIX, SIM_PAD + r * SIM_PIX, SIM_PIX - 1, SIM_PIX - 1);
                     }
-                    drawDot(seg7Ctx, offsetX + 110, offsetY + 171, item.dp, onColor, offColor);
-                    offsetX += 120;
                 }
             }
-        }
 
-        // Initialize all apps on load
-        initR4();
-        initLCD();
-        generate7Seg();
-        updateLcdSimSettings(); 
-        render7SegSim();
-    </script>
-</body>
+            function handleSimInteract(e) {
+                const rect = simCanvas.getBoundingClientRect();
+
+                // Calculate scale in case CSS max-width shrinks the canvas visually
+                const scaleX = simCanvas.width / rect.width;
+                const scaleY = simCanvas.height / rect.height;
+
+                const clientX = e.clientX || (e.touches && e.touches.length > 0 ? e.touches[0].clientX : undefined);
+                const clientY = e.clientY || (e.touches && e.touches.length > 0 ? e.touches[0].clientY : undefined);
+
+                if (clientX === undefined || clientY === undefined) return;
+
+                // Apply scaling to the click coordinates
+                const c = Math.floor(((clientX - rect.left) * scaleX - SIM_PAD) / SIM_PIX);
+                const r = Math.floor(((clientY - rect.top) * scaleY - SIM_PAD) / SIM_PIX);
+
+                if (c >= 0 && c < simData[0].length && r >= 0 && r < simData.length) {
+                    if (Array.from({ length: simRows - 1 }, (_, i) => (i + 1) * SIM_H + i).includes(r)) return;
+                    if (Array.from({ length: simCols - 1 }, (_, i) => (i + 1) * SIM_W + i).includes(c)) return;
+
+                    if (e.type === "mousedown" || e.type === "touchstart") {
+                        simDraw = true;
+                        simMode = simData[r][c] ? 0 : 1;
+                    }
+                    if (simDraw) {
+                        simData[r][c] = simMode;
+                        drawLcdSim();
+                    }
+                }
+            }
+
+            simCanvas.addEventListener("mousedown", handleSimInteract);
+            simCanvas.addEventListener("mousemove", handleSimInteract);
+            window.addEventListener("mouseup", () => (simDraw = false));
+
+            simCanvas.addEventListener(
+                "touchstart",
+                (e) => {
+                    e.preventDefault();
+                    handleSimInteract(e);
+                },
+                { passive: false }
+            );
+            simCanvas.addEventListener(
+                "touchmove",
+                (e) => {
+                    e.preventDefault();
+                    handleSimInteract(e);
+                },
+                { passive: false }
+            );
+            window.addEventListener("touchend", () => (simDraw = false));
+
+            const seg7Canvas = document.getElementById("sim7-canvas");
+            const seg7Ctx = seg7Canvas.getContext("2d");
+
+            const SEG_MAP = {
+                0: ["A", "B", "C", "D", "E", "F"],
+                1: ["B", "C"],
+                2: ["A", "B", "D", "E", "G"],
+                3: ["A", "B", "C", "D", "G"],
+                4: ["B", "C", "F", "G"],
+                5: ["A", "C", "D", "F", "G"],
+                6: ["A", "C", "D", "E", "F", "G"],
+                7: ["A", "B", "C"],
+                8: ["A", "B", "C", "D", "E", "F", "G"],
+                9: ["A", "B", "C", "D", "F", "G"],
+                A: ["A", "B", "C", "E", "F", "G"],
+                B: ["C", "D", "E", "F", "G"],
+                C: ["A", "D", "E", "F"],
+                D: ["B", "C", "D", "E", "G"],
+                E: ["A", "D", "E", "F", "G"],
+                F: ["A", "E", "F", "G"],
+                G: ["A", "C", "D", "E", "F", "G"],
+                H: ["B", "C", "E", "F", "G"],
+                I: ["E", "F"],
+                J: ["B", "C", "D", "E"],
+                L: ["D", "E", "F"],
+                N: ["C", "E", "G"],
+                O: ["A", "B", "C", "D", "E", "F"],
+                P: ["A", "B", "E", "F", "G"],
+                Q: ["A", "B", "C", "F", "G"],
+                R: ["E", "G"],
+                S: ["A", "C", "D", "F", "G"],
+                T: ["D", "E", "F", "G"],
+                U: ["B", "C", "D", "E", "F"],
+                Y: ["B", "C", "D", "F", "G"],
+                "-": ["G"],
+                _: ["D"],
+                " ": [],
+            };
+
+            const SEG_POLYS = {
+                A: [
+                    [18, 0],
+                    [82, 0],
+                    [88, 8],
+                    [82, 16],
+                    [18, 16],
+                    [12, 8],
+                ],
+                B: [
+                    [100, 18],
+                    [100, 82],
+                    [92, 90],
+                    [84, 82],
+                    [84, 18],
+                    [92, 10],
+                ],
+                C: [
+                    [100, 98],
+                    [100, 162],
+                    [92, 170],
+                    [84, 162],
+                    [84, 98],
+                    [92, 90],
+                ],
+                D: [
+                    [18, 180],
+                    [82, 180],
+                    [88, 172],
+                    [82, 164],
+                    [18, 164],
+                    [12, 172],
+                ],
+                E: [
+                    [0, 98],
+                    [0, 162],
+                    [8, 170],
+                    [16, 162],
+                    [16, 98],
+                    [8, 90],
+                ],
+                F: [
+                    [0, 18],
+                    [0, 82],
+                    [8, 90],
+                    [16, 82],
+                    [16, 18],
+                    [8, 10],
+                ],
+                G: [
+                    [18, 90],
+                    [24, 84],
+                    [76, 84],
+                    [82, 90],
+                    [76, 96],
+                    [24, 96],
+                ],
+            };
+
+            function drawPolygon(ctx, points, dx, dy, isOn, onColor, offColor) {
+                ctx.beginPath();
+                ctx.moveTo(points[0][0] + dx, points[0][1] + dy);
+                for (let i = 1; i < points.length; i++) ctx.lineTo(points[i][0] + dx, points[i][1] + dy);
+                ctx.closePath();
+
+                ctx.fillStyle = isOn ? onColor : offColor;
+                ctx.shadowColor = isOn ? onColor : "transparent";
+                ctx.shadowBlur = isOn ? 12 : 0;
+                ctx.fill();
+            }
+
+            function drawDot(ctx, x, y, isOn, onColor, offColor) {
+                ctx.beginPath();
+                ctx.arc(x, y, 9, 0, Math.PI * 2);
+                ctx.fillStyle = isOn ? onColor : offColor;
+                ctx.shadowColor = isOn ? onColor : "transparent";
+                ctx.shadowBlur = isOn ? 12 : 0;
+                ctx.fill();
+            }
+
+            function render7SegSim() {
+                const text = document.getElementById("sim7-text").value.toUpperCase();
+                const numDigits = parseInt(document.getElementById("sim7-digits").value);
+                const bgColor = document.getElementById("sim7-bg").value;
+                const onColor = document.getElementById("sim7-color").value;
+                const offColor = hexToRgba(onColor, 0.08); // Ghosting
+
+                // Parse text
+                let parsed = [];
+                for (let char of text) {
+                    if (char === "." && parsed.length > 0 && parsed[parsed.length - 1].char !== ":") {
+                        parsed[parsed.length - 1].dp = true;
+                    } else {
+                        parsed.push({ char: char, dp: false });
+                    }
+                }
+
+                // Canvas Sizing
+                let canvasWidth = 40;
+                for (let i = 0; i < numDigits; i++) {
+                    if (parsed[i] && parsed[i].char === ":") canvasWidth += 40;
+                    else canvasWidth += 120;
+                }
+
+                seg7Canvas.width = canvasWidth;
+                seg7Canvas.height = 240;
+
+                seg7Ctx.fillStyle = bgColor;
+                seg7Ctx.fillRect(0, 0, seg7Canvas.width, seg7Canvas.height);
+
+                let offsetX = 20;
+                const offsetY = 30;
+
+                for (let i = 0; i < numDigits; i++) {
+                    let item = parsed[i] || { char: " ", dp: false };
+
+                    if (item.char === ":") {
+                        drawDot(seg7Ctx, offsetX + 20, offsetY + 50, true, onColor, offColor);
+                        drawDot(seg7Ctx, offsetX + 20, offsetY + 130, true, onColor, offColor);
+                        offsetX += 40;
+                    } else {
+                        let activeSegs = SEG_MAP[item.char] || [];
+                        for (const [seg, points] of Object.entries(SEG_POLYS)) {
+                            let isOn = activeSegs.includes(seg);
+                            drawPolygon(seg7Ctx, points, offsetX, offsetY, isOn, onColor, offColor);
+                        }
+                        drawDot(seg7Ctx, offsetX + 110, offsetY + 171, item.dp, onColor, offColor);
+                        offsetX += 120;
+                    }
+                }
+            }
+
+            // --- UNO R4 SEQUENCE LOGIC ---
+            let seqFrames = [];
+            let currentSeqIndex = -1;
+            let r4SeqData = Array.from({ length: R4_ROWS }, () => Array(R4_COLS).fill(0));
+
+            // Playback engine variables
+            let isPlaying = false;
+            let playTimeout = null;
+            let playIndex = 0;
+
+            function initR4Seq() {
+                const container = document.getElementById("r4-seq-matrix");
+                container.innerHTML = "";
+                for (let r = 0; r < R4_ROWS; r++) {
+                    for (let c = 0; c < R4_COLS; c++) {
+                        const led = document.createElement("div");
+                        led.className = "led-r4";
+                        led.onclick = () => {
+                            if (isPlaying) return; // Prevent drawing while animating
+                            r4SeqData[r][c] = r4SeqData[r][c] ? 0 : 1;
+                            led.classList.toggle("on");
+                        };
+                        container.appendChild(led);
+                    }
+                }
+                renderSeqTimeline();
+            }
+
+            function renderR4SeqGrid() {
+                const leds = document.getElementById("r4-seq-matrix").children;
+                for (let r = 0; r < R4_ROWS; r++) {
+                    for (let c = 0; c < R4_COLS; c++) {
+                        const led = leds[r * R4_COLS + c];
+                        if (r4SeqData[r][c]) led.classList.add("on");
+                        else led.classList.remove("on");
+                    }
+                }
+            }
+
+            function stopPlayback() {
+                if (isPlaying) togglePlaySeq();
+            }
+
+            function clearR4SeqGrid() {
+                stopPlayback();
+                r4SeqData = Array.from({ length: R4_ROWS }, () => Array(R4_COLS).fill(0));
+                currentSeqIndex = -1;
+                document.getElementById("btn-update-seq").disabled = true;
+                renderSeqTimeline();
+                renderR4SeqGrid();
+            }
+
+            function addSeqFrame() {
+                stopPlayback();
+                const duration = parseInt(document.getElementById("seq-duration").value) || 100;
+                const frameData = r4SeqData.map((row) => [...row]);
+                seqFrames.push({ data: frameData, duration: duration });
+                currentSeqIndex = seqFrames.length - 1;
+                renderSeqTimeline();
+                generateR4SeqCode();
+            }
+
+            function updateSeqFrame() {
+                stopPlayback();
+                if (currentSeqIndex < 0 || currentSeqIndex >= seqFrames.length) return;
+                const duration = parseInt(document.getElementById("seq-duration").value) || 100;
+                seqFrames[currentSeqIndex] = {
+                    data: r4SeqData.map((row) => [...row]),
+                    duration: duration,
+                };
+                renderSeqTimeline();
+                generateR4SeqCode();
+            }
+
+            function loadSeqFrame(index) {
+                if (isPlaying) return;
+                currentSeqIndex = index;
+                r4SeqData = seqFrames[index].data.map((row) => [...row]);
+                document.getElementById("seq-duration").value = seqFrames[index].duration;
+                document.getElementById("btn-update-seq").disabled = false;
+                renderSeqTimeline();
+                renderR4SeqGrid();
+            }
+
+            function deleteSeqFrame(index, event) {
+                event.stopPropagation();
+                stopPlayback();
+                seqFrames.splice(index, 1);
+                if (currentSeqIndex === index) {
+                    clearR4SeqGrid();
+                } else if (currentSeqIndex > index) {
+                    currentSeqIndex--;
+                }
+                renderSeqTimeline();
+                generateR4SeqCode();
+            }
+
+            function renderSeqTimeline() {
+                const timeline = document.getElementById("seq-timeline");
+                timeline.innerHTML = "";
+
+                const playBtn = document.getElementById("btn-play-seq");
+
+                if (seqFrames.length === 0) {
+                    timeline.innerHTML =
+                        '<span style="color:#94a3b8; font-size:14px;">No frames added. Draw a shape and click "Add Frame".</span>';
+                    document.getElementById("btn-update-seq").disabled = true;
+                    playBtn.disabled = true;
+                    playBtn.style.backgroundColor = "gray";
+                    playBtn.innerHTML = "&#9654;"; // Reset to Play icon
+                    playBtn.classList.remove("playing");
+                    return;
+                }
+
+                if (!isPlaying) {
+                    playBtn.disabled = false;
+                    playBtn.style.backgroundColor = "#2ecc71"; // Green
+                    playBtn.innerHTML = "&#9654;"; // Play icon
+                    playBtn.classList.remove("playing");
+                }
+
+                seqFrames.forEach((frame, index) => {
+                    const btn = document.createElement("div");
+                    btn.className = "seq-frame-btn" + (index === currentSeqIndex ? " active" : "");
+
+                    let thumbHTML = `<div class="seq-thumb">`;
+                    for (let r = 0; r < R4_ROWS; r++) {
+                        for (let c = 0; c < R4_COLS; c++) {
+                            const isOn = frame.data[r][c] ? "on" : "";
+                            thumbHTML += `<div class="seq-thumb-led ${isOn}"></div>`;
+                        }
+                    }
+                    thumbHTML += `</div>`;
+
+                    btn.innerHTML = `
+            ${thumbHTML}
+            <div class="seq-info">
+                <span>${frame.duration}ms</span>
+                <span class="del-btn" onclick="deleteSeqFrame(${index}, event)">✖</span>
+            </div>
+        `;
+                    btn.onclick = () => loadSeqFrame(index);
+                    timeline.appendChild(btn);
+                });
+
+                if (!isPlaying) document.getElementById("btn-update-seq").disabled = currentSeqIndex < 0;
+            }
+
+            // --- Playback Engine ---
+            function togglePlaySeq() {
+                if (seqFrames.length === 0) return;
+                const playBtn = document.getElementById("btn-play-seq");
+
+                if (isPlaying) {
+                    // Stop Sequence
+                    isPlaying = false;
+                    clearTimeout(playTimeout);
+                    playBtn.innerHTML = "&#9654;"; // Play icon
+                    playBtn.classList.remove("playing");
+                    playBtn.style.backgroundColor = "#2ecc71"; // Green
+
+                    // Restore where the user left off
+                    if (currentSeqIndex >= 0) {
+                        loadSeqFrame(currentSeqIndex);
+                    } else {
+                        clearR4SeqGrid();
+                    }
+                } else {
+                    // Start Sequence
+                    isPlaying = true;
+                    playIndex = 0;
+                    playBtn.innerHTML = "&#9632;"; // Stop icon (square)
+                    playBtn.classList.add("playing");
+                    playBtn.style.backgroundColor = "#e74c3c"; // Red
+                    document.getElementById("btn-update-seq").disabled = true;
+                    currentSeqIndex = -1;
+                    renderSeqTimeline();
+
+                    playNextFrame();
+                }
+            }
+
+            function playNextFrame() {
+                if (!isPlaying) return;
+
+                if (playIndex >= seqFrames.length) {
+                    if (document.getElementById("seq-loop").checked) {
+                        playIndex = 0; // Loop back to start
+                    } else {
+                        togglePlaySeq(); // End playback automatically
+                        return;
+                    }
+                }
+
+                const frame = seqFrames[playIndex];
+                r4SeqData = frame.data.map((row) => [...row]);
+                renderR4SeqGrid();
+
+                // Highlight active thumbnail
+                document.querySelectorAll(".seq-frame-btn").forEach((btn, idx) => {
+                    if (idx === playIndex) btn.classList.add("active");
+                    else btn.classList.remove("active");
+                });
+
+                playTimeout = setTimeout(() => {
+                    playIndex++;
+                    playNextFrame();
+                }, frame.duration);
+            }
+
+            function generateR4SeqCode() {
+                if (seqFrames.length === 0) {
+                    document.getElementById("code-r4-seq").textContent = "// Add frames to generate sequence code.";
+                    return;
+                }
+
+                let code = `const uint32_t sequence[][4] = {\n`;
+
+                seqFrames.forEach((frame, i) => {
+                    let binString = "";
+                    for (let r = 0; r < R4_ROWS; r++) {
+                        for (let c = 0; c < R4_COLS; c++) {
+                            binString += frame.data[r][c] ? "1" : "0";
+                        }
+                    }
+
+                    let hex0 = parseInt(binString.substring(0, 32), 2).toString(16).padStart(8, "0");
+                    let hex1 = parseInt(binString.substring(32, 64), 2).toString(16).padStart(8, "0");
+                    let hex2 = parseInt(binString.substring(64, 96), 2).toString(16).padStart(8, "0");
+
+                    code += `  { 0x${hex0}, 0x${hex1}, 0x${hex2}, ${frame.duration} }`;
+                    code += i < seqFrames.length - 1 ? `,\n` : `\n`;
+                });
+
+                code += `};\n\n`;
+                code += `// --- Execution Example ---\n`;
+                code += `// matrix.begin();\n`;
+                code += `// matrix.loadSequence(sequence);\n`;
+                code += `// matrix.play(true); //repeat`;
+
+                document.getElementById("code-r4-seq").textContent = code;
+            }
+
+            // Initialize all apps on load
+            initR4();
+            initR4Seq();
+            initLCD();
+            generate7Seg();
+            updateLcdSimSettings();
+            render7SegSim();
+        </script>
+    </body>
 </html>
