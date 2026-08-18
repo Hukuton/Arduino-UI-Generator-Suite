@@ -627,8 +627,8 @@
 
             let codeUint = `// --- FORMAT 2: 32-bit Integer Array ---\n`;
             codeUint += `const uint32_t customFrame32[] = {\n`;
-            codeUint += `  0x${hex0},\n`;
-            codeUint += `  0x${hex1},\n`;
+            codeUint += `  0x${hex0},`;
+            codeUint += `  0x${hex1},`;
             codeUint += `  0x${hex2}\n`;
             codeUint += `};\n// matrix.loadFrame(customFrame32);`;
 
